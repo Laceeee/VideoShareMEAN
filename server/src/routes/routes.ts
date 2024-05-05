@@ -1,6 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { PassportStatic } from 'passport';
 import { User } from '../model/User';
+import { Roles } from '../model/Roles';
 
 export const configureRoutes = (passport: PassportStatic, router: Router): Router => {
 
@@ -8,15 +9,25 @@ export const configureRoutes = (passport: PassportStatic, router: Router): Route
         res.status(200).send('Hello World!');
     });
 
-    router.post('/register', (req: Request, res: Response) => {
+    router.post('/register', async (req: Request, res: Response) => {
         const email = req.body.email;
+        const username = req.body.username;
         const password = req.body.password;
-        const user = new User({email: email, password: password});
-        user.save().then(data => {
-            res.status(200).send(data);
-        }).catch(error => {
-            res.status(500).send(error);
-        })
+        const roleType = Roles.viewer;
+
+        try {
+            const existingUser = await User.findOne({ email: email });
+
+            if (existingUser) {
+                return res.status(400).send('Email already exists.');
+            }
+            const newUser = new User({ email: email, username: username, password: password, roleType: roleType});
+            const savedUser = await newUser.save();
+
+            res.status(200).send(savedUser);
+        } catch (error) {
+            res.status(500).send('Internal server error.');
+        }
     });
 
     router.post('/login', (req: Request, res: Response, next: NextFunction) => {

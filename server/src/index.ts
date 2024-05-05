@@ -6,6 +6,7 @@ import expressSession from 'express-session';
 import passport from 'passport';
 import { configurePassport } from './passport/passport';
 import mongoose from 'mongoose';
+import cors from 'cors';
 
 const app = express();
 const port = 5000;
@@ -18,6 +19,20 @@ mongoose.connect(dbUrl).then(() => {
     console.log(error);
     return;
 })
+
+// cors
+const whitelist = ['http://localhost:4200']
+const corsOptions = {
+    origin: (origin: string | undefined, callback: (error: Error | null, allowed?: boolean) => void) => {
+        if (whitelist.indexOf(origin!) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS.'));
+        }
+    }
+}
+
+app.use(cors(corsOptions));
 
 // bodyParser
 app.use(bodyParser.urlencoded({extended: true}));

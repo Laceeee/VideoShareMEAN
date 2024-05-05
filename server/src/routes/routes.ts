@@ -2,8 +2,13 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { PassportStatic } from 'passport';
 import { User } from '../model/User';
 import { Roles } from '../model/Roles';
+import { Video } from '../model/Video';
+import { GridFSBucket} from 'mongodb';
+import { Readable } from 'stream';
+import { Types } from 'mongoose';
+import multer from 'multer';
 
-export const configureRoutes = (passport: PassportStatic, router: Router): Router => {
+export const configureRoutes = (passport: PassportStatic, router: Router, gfs: GridFSBucket): Router => {
 
     router.get('/', (req: Request, res: Response) => {
         res.status(200).send('Hello World!');
@@ -83,7 +88,92 @@ export const configureRoutes = (passport: PassportStatic, router: Router): Route
                 res.status(500).send('Internal server error.');
             })
         } else {
-            res.status(500).send('User is not logged in.');
+            res.status(403).send('User is not logged in.');
+        }
+    });
+
+    const upload = multer({ storage: multer.memoryStorage() });
+
+    router.post('/upload', upload.single('video'), async (req: Request, res: Response) => {
+        if (req.isAuthenticated()) {
+            try {
+                const { user_id, title, description} = req.body;
+                const videoFile = req.file;
+
+                if (!videoFile || !videoFile.buffer) {
+                    throw new Error('No file uploaded or buffer is undefined');
+                }
+
+                const videoStream = Readable.from([videoFile.buffer]);
+    
+                const uploadStream = gfs.openUploadStream(title);
+                videoStream.pipe(uploadStream);
+    
+                const video = new Video({
+                    user_id,
+                    video_id: uploadStream.id,
+                    title,
+                    description,
+                    upload_date: new Date(),
+                });
+                await video.save();
+    
+                res.status(200).json('Video uploaded successfully');
+            } catch (error) {
+                console.log(error);
+                res.status(500).send('Internal server error.');
+            }
+        } else {
+            res.status(403).send('User is not logged in.');
+        }
+    });
+
+    router.get('/get-video/:_id', async (req: Request, res: Response) => {
+        if (req.isAuthenticated()) {
+            const _id = req.params._id;
+        
+            try {
+                const video = await Video.findOne({ _id: _id });
+                if (!video) {
+                    return res.status(404).send('Video not found.');
+                }
+        
+                const downloadStream = gfs.openDownloadStream(new Types.ObjectId(video.video_id));
+        
+                res.set('Content-Type', 'video/mp4');
+                res.set('Content-Disposition', `attachment; filename="${video.title}.mp4"`);
+                
+                downloadStream.pipe(res);
+            } catch (error) {
+                console.error('Error retrieving video:', error);
+                res.status(500).send('Internal server error.');
+            }
+        } else {
+            res.status(403).send('User is not logged in.');
+        }
+    });
+    
+    router.delete('/delete-video/:_id', async (req: Request, res: Response) => {
+        if (req.isAuthenticated()) {
+            try {
+                const _id = req.params._id;
+    
+                const video = await Video.findOne({ _id: _id });
+                if (!video) {
+                    return res.status(404).send('Video not found.');
+                }
+    
+                await gfs.delete(new Types.ObjectId(video.video_id));
+    
+                await Video.deleteOne({ _id: _id });
+    
+                res.status(200).send('Video deleted successfully.');
+            } catch (error) {
+                console.error('Error deleting video:', error);
+                res.status(500).send('Internal server error.');
+            }
+        } else {
+            res.status(403).send('User is not logged in.');
         }
     });
 

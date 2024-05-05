@@ -13,13 +13,12 @@ export class AuthService {
     'Content-Type': 'application/x-www-form-urlencoded'
   });
 
-  // login
   login(email: string, password: string) {
     const body = new URLSearchParams();
     body.set('username', email);
     body.set('password', password);
 
-    return this.http.post('http://localhost:5000/login', body, {headers: this.headers});
+    return this.http.post('http://localhost:5000/login', body, {headers: this.headers, withCredentials: true});
   }
 
   register(user: User) {
@@ -29,5 +28,13 @@ export class AuthService {
     body.set('password', user.password);
 
     return this.http.post('http://localhost:5000/register', body, {headers: this.headers});
+  }
+
+  logout() {
+    return this.http.post('http://localhost:5000/logout', {}, {withCredentials: true, responseType: 'text'});
+  }
+
+  checkAuth() {
+    return this.http.get<Boolean>('http://localhost:5000/checkAuth', {withCredentials: true});
   }
 }

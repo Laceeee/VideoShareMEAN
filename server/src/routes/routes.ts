@@ -65,5 +65,27 @@ export const configureRoutes = (passport: PassportStatic, router: Router): Route
         }
     });
 
+    router.get('/checkAuth', (req: Request, res: Response) => {
+        if (req.isAuthenticated()) {
+            res.status(200).send(true);
+        } else {
+            res.status(403).send(false);
+        }
+    });
+    
+    router.get('/getAllUsers', (req: Request, res: Response) => {
+        if (req.isAuthenticated()) {
+            const query = User.find();
+            query.then(data => {
+                res.status(200).send(data);
+            }).catch(error => {
+                console.log(error);
+                res.status(500).send('Internal server error.');
+            })
+        } else {
+            res.status(500).send('User is not logged in.');
+        }
+    });
+
     return router;
 }

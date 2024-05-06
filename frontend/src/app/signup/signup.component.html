@@ -1,15 +1,31 @@
-<div class="login-container">
-    <form class="login-form" [formGroup]="signupForm" (ngSubmit)="onSubmit()">
-        <input formControlName="email" type="email" placeholder="Email" required />
-        <input formControlName="username" type="text" placeholder="Username" required />
-        <input formControlName="password" type="password" placeholder="Password" required />
-        <input formControlName="confirmPassword" type="password" placeholder="Confirm password" required />
-        <div class="buttons">
-            <button type="submit">Sign Up</button>
-        </div>
-        <div class="buttons">
-            <button type="reset" (click)="goBack()">Back</button>
-        </div>
-    </form>    
+<app-header></app-header>
+<div class="signup-container">
+    <form class="signup-form" [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+      <mat-form-field appearance="fill">
+        <mat-label>Email</mat-label>
+        <input matInput formControlName="email" type="email" placeholder="Email" required>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Username</mat-label>
+        <input matInput formControlName="username" type="text" placeholder="Username" required>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Password</mat-label>
+        <input matInput formControlName="password" type="password" placeholder="Password" required>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Confirm Password</mat-label>
+        <input matInput formControlName="confirmPassword" type="password" placeholder="Confirm password" required>
+        <mat-error *ngIf="signupForm.get('confirmPassword')?.errors?.['mustMatch']">
+          Passwords do not match!
+        </mat-error>
+      </mat-form-field>
+      <div class="buttons">
+        <button mat-raised-button color="primary" type="submit">Sign Up</button>
+      </div>
+      <div class="buttons">
+        <button mat-raised-button color="warn" type="reset" (click)="goBack()">Back</button>
+      </div>
+    </form>
 </div>
 

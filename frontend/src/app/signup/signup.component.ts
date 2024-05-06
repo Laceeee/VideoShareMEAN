@@ -2,11 +2,15 @@ import { CommonModule, Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../shared/services/auth.service';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { HeaderComponent } from '../header/header.component';
 
 @Component({
   selector: 'app-signup',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, HeaderComponent, MatFormFieldModule, MatInputModule, MatButtonModule],
   templateUrl: './signup.component.html',
   styleUrl: './signup.component.scss'
 })
@@ -23,10 +27,10 @@ export class SignupComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       username: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required]]
+      confirmPassword: ['', [Validators.required, Validators.minLength(6)]]
     }, {
       validator: this.mustMatch('password', 'confirmPassword')
-    })
+    });
   }
 
   mustMatch(controlName: string, matchingControlName: string) {

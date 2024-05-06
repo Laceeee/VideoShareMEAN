@@ -5,7 +5,7 @@ interface IVideo extends Document {
     user_id: string;
     video_id: string;
     title: string;
-    description?: string;
+    description: string;
     upload_date: Date;
     likedBy?: string[];
     likesCount?: number;
@@ -19,7 +19,7 @@ const VideoSchema: Schema<IVideo> = new mongoose.Schema({
     user_id: { type: String, required: true },
     video_id: { type: String, required: true },
     title: { type: String, required: true },
-    description: { type: String },
+    description: { type: String, required: true},
     upload_date: { type: Date, required: true },
     likedBy: [{ type: String }],
     likesCount: { type: Number, default: 0 },

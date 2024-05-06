@@ -4,6 +4,7 @@ import { User } from '../shared/model/User';
 import { UserService } from '../shared/services/user.service';
 import { AuthService } from '../shared/services/auth.service';
 import { Router } from '@angular/router';
+import { VideoService } from '../shared/services/video.service';
 
 @Component({
   selector: 'app-user-management',
@@ -14,8 +15,14 @@ import { Router } from '@angular/router';
 })
 export class UserManagementComponent {
   users?: User[];
+  videoSource?: string;
 
-  constructor(private userService: UserService, private authService: AuthService, private router: Router) {}
+  constructor(
+    private userService: UserService, 
+    private authService: AuthService, 
+    private router: Router,
+    private videoService: VideoService
+  ) {}
 
   ngOnInit() {
     this.userService.getAll().subscribe({
@@ -24,7 +31,11 @@ export class UserManagementComponent {
       }, error: (err) => {
         console.log(err);
       }
-    })
+    });
+
+    console.log(sessionStorage.getItem('userId'), sessionStorage.getItem('roleType'))
+
+    this.streamVideo('66394ebeb064d926deea292a');
   }
 
   logout() {
@@ -36,5 +47,15 @@ export class UserManagementComponent {
         console.log(err);
       }
     })
+  }
+
+  streamVideo(id: string) {
+    this.videoService.streamVideo(id).subscribe({
+      next: (blob) => {
+        this.videoSource = URL.createObjectURL(blob);
+      }, error: (err) => {
+        console.log('Error streaming videos: ', err);
+      }
+    });
   }
 }

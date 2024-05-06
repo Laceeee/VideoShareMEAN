@@ -6,7 +6,7 @@ import { User } from '../model/User';
   providedIn: 'root'
 })
 export class UserService {
-
+  
   constructor(private http: HttpClient) { }
 
   getAll() {

@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { User } from '../model/User';
+import { User, LoggedInUser } from '../model/User';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +18,7 @@ export class AuthService {
     body.set('username', email);
     body.set('password', password);
 
-    return this.http.post('http://localhost:5000/login', body, {headers: this.headers, withCredentials: true});
+    return this.http.post<LoggedInUser>('http://localhost:5000/login', body, {headers: this.headers, withCredentials: true});
   }
 
   register(user: User) {

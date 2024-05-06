@@ -24,8 +24,9 @@ export class LoginComponent {
       this.authService.login(this.email, this.password).subscribe({
         next: (data) => {
           if (data) {
+            sessionStorage.setItem('userId', data.id);
+            sessionStorage.setItem('roleType', data.roleType);
             this.router.navigateByUrl('/user-management');
-            console.log(data);
           }
         }, error: (err) => {
             console.log(err);

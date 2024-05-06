@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import { configureRoutes } from './routes/routes';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
@@ -44,6 +44,9 @@ app.use(cors(corsOptions));
 
 // bodyParser
 app.use(bodyParser.urlencoded({extended: true}));
+
+// express.json
+app.use(express.json());
 
 // cookieParser
 app.use(cookieParser());

@@ -1,12 +1,13 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { PassportStatic } from 'passport';
+import { PassportStatic, use } from 'passport';
 import { User } from '../model/User';
 import { Roles } from '../model/Roles';
 import { Video } from '../model/Video';
-import { GridFSBucket} from 'mongodb';
+import { GridFSBucket, ObjectId } from 'mongodb';
 import { Readable } from 'stream';
 import { Types } from 'mongoose';
 import multer from 'multer';
+import mongoose from 'mongoose';
 
 export const configureRoutes = (passport: PassportStatic, router: Router, gfs: GridFSBucket): Router => {
 
@@ -42,14 +43,10 @@ export const configureRoutes = (passport: PassportStatic, router: Router, gfs: G
             }
             else {
                 if (!user) {
-                    res.status(400).send('User not found.')
+                    res.status(401).send('Incorrect email or password.')
                 } else {
                     req.login(user, (err: string | null) => {
-                        if (err) {
-                            res.status(401).send('Internal server error. ' + err);
-                        } else {
-                            res.status(200).send(user);  
-                        }
+                        res.status(200).send(user);
                     });
                 }
             }
@@ -74,7 +71,7 @@ export const configureRoutes = (passport: PassportStatic, router: Router, gfs: G
         if (req.isAuthenticated()) {
             res.status(200).send(true);
         } else {
-            res.status(403).send(false);
+            res.status(401).send(false);
         }
     });
     
@@ -92,9 +89,32 @@ export const configureRoutes = (passport: PassportStatic, router: Router, gfs: G
         }
     });
 
-    const upload = multer({ storage: multer.memoryStorage() });
+    const upload = multer({ 
+        storage: multer.memoryStorage(),
+        limits: {
+            fileSize: 50 * 1024 * 1024,
+            files: 1
+        }
+    });
 
-    router.post('/upload', upload.single('video'), async (req: Request, res: Response) => {
+    const handleUpload = (req: Request, res: Response, next: NextFunction) => {
+        upload.single('video')(req, res, (err) => {
+            if (err instanceof multer.MulterError) {
+                if (err.code === 'LIMIT_FILE_SIZE') {
+                    return res.status(413).send('File size limit exceeded. Maximum file size is 50MB.');
+                } else if (err.code === 'LIMIT_FILE_COUNT') {
+                    return res.status(413).send('Only one file is allowed.');
+                } else {
+                    return res.status(413).send(err.message);
+                }
+            } else if (err) {
+                return res.status(500).send('Internal server error.');
+            }
+            next();
+        });
+    };
+
+    router.post('/upload', handleUpload, async (req: Request, res: Response) => {
         if (req.isAuthenticated()) {
             try {
                 const { user_id, title, description} = req.body;
@@ -105,7 +125,7 @@ export const configureRoutes = (passport: PassportStatic, router: Router, gfs: G
                 }
 
                 const videoStream = Readable.from([videoFile.buffer]);
-    
+
                 const uploadStream = gfs.openUploadStream(title);
                 videoStream.pipe(uploadStream);
     
@@ -118,9 +138,8 @@ export const configureRoutes = (passport: PassportStatic, router: Router, gfs: G
                 });
                 await video.save();
     
-                res.status(200).json('Video uploaded successfully');
+                res.status(200).send(video);
             } catch (error) {
-                console.log(error);
                 res.status(500).send('Internal server error.');
             }
         } else {
@@ -128,26 +147,67 @@ export const configureRoutes = (passport: PassportStatic, router: Router, gfs: G
         }
     });
 
-    router.get('/get-video/:_id', async (req: Request, res: Response) => {
+    router.get('/get-video/:_id', (req: Request, res: Response) => {
+        if (req.isAuthenticated()) {
+            const _id = req.params._id;
+            const query = Video.findOneAndUpdate({ _id: _id }, { $inc: { views: 1 }}, {new: true});
+            query.then(video => {
+                res.status(200).send(video);
+            }).catch(error => {
+                console.log(error);
+                res.status(500).send('Internal server error.');
+            })
+        } else {
+            res.status(403).send('User is not logged in.');
+        }
+    });
+
+    const bucket = new GridFSBucket(mongoose.connection.db, { bucketName: 'videos' });
+
+    router.get('/stream-video/:_id', async (req: Request, res: Response) => {
         if (req.isAuthenticated()) {
             const _id = req.params._id;
         
             try {
-                const video = await Video.findOne({ _id: _id });
-                if (!video) {
+                const videoId = new ObjectId(_id);
+
+                const videoObject = await bucket.find({ _id: videoId }).toArray();
+                if (videoObject.length === 0) {
                     return res.status(404).send('Video not found.');
                 }
-        
-                const downloadStream = gfs.openDownloadStream(new Types.ObjectId(video.video_id));
-        
-                res.set('Content-Type', 'video/mp4');
-                res.set('Content-Disposition', `attachment; filename="${video.title}.mp4"`);
-                
+
+                const downloadStream = bucket.openDownloadStream(videoId);
+
                 downloadStream.pipe(res);
             } catch (error) {
                 console.error('Error retrieving video:', error);
                 res.status(500).send('Internal server error.');
             }
+        } else {
+            res.status(403).send('User is not logged in.');
+        }
+    });
+
+    router.put('/update-video/:_id', (req: Request, res: Response) => {
+        if (req.isAuthenticated()) {
+            const _id = req.params._id;
+            const { title, description } = req.body;
+
+            if (!title || !description) {
+                return res.status(400).send('Title and description are required.');
+            }
+
+            Video.findOneAndUpdate({ _id: _id }, { title, description }, { new: true })
+                .then(updatedVideo => {
+                    if (!updatedVideo) {
+                        return res.status(404).send('Video not found.');
+                    }
+                    res.status(200).send(updatedVideo);
+                })
+                .catch(error => {
+                    console.error(error);
+                    res.status(500).send('Internal server error.');
+                });
         } else {
             res.status(403).send('User is not logged in.');
         }

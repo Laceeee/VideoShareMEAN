@@ -18,12 +18,12 @@ export const configurePassport = (passport: PassportStatic): PassportStatic => {
             if (user) {
                 user.comparePassword(password, (error, isMatch) => {
                     if (error) {
-                        done('Internal server error.');
+                        done(error);
                     }
                     if (isMatch) {
-                        done(null, user._id);
+                        done(null, { id: user._id, roleType: user.roleType });
                     } else {
-                        done('Incorrect password.');
+                        done(null, undefined);
                     }
                 });
             } else {

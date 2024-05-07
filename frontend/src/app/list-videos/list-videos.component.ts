@@ -5,6 +5,7 @@ import { Video } from '../shared/model/Video';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table' 
 import { MatPaginatorModule, MatPaginator, PageEvent } from '@angular/material/paginator';
 import { DatePipe } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-list-videos',
@@ -15,12 +16,12 @@ import { DatePipe } from '@angular/common';
 })
 export class ListVideosComponent implements AfterViewInit, OnInit {
   videos?: Video[];
-  displayedColumns: string[] = ['title', 'description', 'upload-date', 'views'];
+  displayedColumns: string[] = ['title', 'uploader', 'description', 'upload-date', 'views'];
   dataSource = new MatTableDataSource<Video>();
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  constructor(private videoService: VideoService) {}
+  constructor(private videoService: VideoService, private router: Router) {}
   
   ngOnInit(): void {
     this.videoService.listVideos().subscribe({
@@ -37,8 +38,16 @@ export class ListVideosComponent implements AfterViewInit, OnInit {
     this.dataSource.paginator = this.paginator;
   }
 
-  loadVideo(id: string) {
-    console.log(id);
+  loadVideo(id: string, username: string, title: string) {
+    const sanitizedTitle = title
+      .toLowerCase()
+      .replace(/[á]/g, 'a')
+      .replace(/[é]/g, 'e')
+      .replace(/[í]/g, 'i')
+      .replace(/[óöő]/g, 'o')
+      .replace(/[úüű]/g, 'u')
+      .replace(/[^a-z0-9-]/g, '-');
+    this.router.navigate(['/video', username, sanitizedTitle], { queryParams: { id: id } });
   }
 
 }

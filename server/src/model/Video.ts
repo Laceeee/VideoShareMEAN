@@ -3,6 +3,7 @@ import { Comment } from './Comment';
 
 interface IVideo extends Document {
     user_id: string;
+    username: string;
     video_id: string;
     title: string;
     description: string;
@@ -17,6 +18,7 @@ interface IVideo extends Document {
 
 const VideoSchema: Schema<IVideo> = new mongoose.Schema({
     user_id: { type: String, required: true },
+    username: { type: String, required: true},
     video_id: { type: String, required: true },
     title: { type: String, required: true },
     description: { type: String, required: true},

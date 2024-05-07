@@ -121,7 +121,7 @@ export const configureRoutes = (passport: PassportStatic, router: Router, gfs: G
     router.post('/upload', handleUpload, async (req: Request, res: Response) => {
         if (req.isAuthenticated()) {
             try {
-                const { user_id, title, description} = req.body;
+                const { user_id, username, title, description} = req.body;
                 const videoFile = req.file;
 
                 if (!videoFile || !videoFile.buffer) {
@@ -135,6 +135,7 @@ export const configureRoutes = (passport: PassportStatic, router: Router, gfs: G
     
                 const video = new Video({
                     user_id,
+                    username,
                     video_id: uploadStream.id,
                     title,
                     description,

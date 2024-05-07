@@ -1,0 +1,25 @@
+table {
+    width: 80%;
+  }
+
+.display-videos {
+    width: 80%;
+    margin: 0 auto;
+}
+
+.display-cell {
+    max-width: 50px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+.clickable {
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  max-width: 50px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

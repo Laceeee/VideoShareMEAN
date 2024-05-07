@@ -151,6 +151,21 @@ export const configureRoutes = (passport: PassportStatic, router: Router, gfs: G
         }
     });
 
+    router.get('/list-videos', (req: Request, res: Response) => {
+        if (req.isAuthenticated()) {
+            const query = Video.find({})
+            query.then(videos => {
+                res.status(200).json(videos);
+            })
+            .catch(error => {
+                console.log(error);
+                res.status(500).send('Internal server error.');
+            });
+        } else {
+            res.status(403).send('User is not logged in.');
+        }
+    });
+
     router.get('/get-video/:_id', (req: Request, res: Response) => {
         if (req.isAuthenticated()) {
             const _id = req.params._id;

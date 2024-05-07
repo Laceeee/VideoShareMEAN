@@ -21,7 +21,7 @@ export const configurePassport = (passport: PassportStatic): PassportStatic => {
                         done(error);
                     }
                     if (isMatch) {
-                        done(null, { id: user._id, roleType: user.roleType });
+                        done(null, { id: user._id, username: user.username, roleType: user.roleType });
                     } else {
                         done(null, undefined);
                     }

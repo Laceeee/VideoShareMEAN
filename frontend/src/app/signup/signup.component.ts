@@ -1,11 +1,12 @@
 import { CommonModule, Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { AuthService } from '../shared/services/auth.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { HeaderComponent } from '../header/header.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-signup',
@@ -20,17 +21,26 @@ export class SignupComponent implements OnInit {
   constructor(
     private formBuidler: FormBuilder, 
     private location: Location, 
-    private authService: AuthService) { }
+    private authService: AuthService,
+    private router: Router
+  ) { }
 
   ngOnInit() {
     this.signupForm = this.formBuidler.group({
       email: ['', [Validators.required, Validators.email]],
-      username: ['', [Validators.required]],
+      username: ['', [Validators.required, this.onlyLettersAndNumbers]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required, Validators.minLength(6)]]
     }, {
       validator: this.mustMatch('password', 'confirmPassword')
     });
+  }
+
+  onlyLettersAndNumbers(control: AbstractControl): ValidationErrors | null {
+    const value = control.value;
+    const regex = /^[a-zA-Z0-9]*$/;
+    const valid = regex.test(value);
+    return valid? null : { invalidUsername: true };
   }
 
   mustMatch(controlName: string, matchingControlName: string) {
@@ -56,6 +66,7 @@ export class SignupComponent implements OnInit {
       this.authService.register(this.signupForm.value).subscribe({
         next: (data) => {
           if (data) {
+            this.router.navigateByUrl('/login');
             console.log(data);
           }
         }, error: (err) => {

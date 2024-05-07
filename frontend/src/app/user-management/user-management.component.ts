@@ -5,11 +5,12 @@ import { UserService } from '../shared/services/user.service';
 import { AuthService } from '../shared/services/auth.service';
 import { Router } from '@angular/router';
 import { VideoService } from '../shared/services/video.service';
+import { HeaderComponent } from '../header/header.component';
 
 @Component({
   selector: 'app-user-management',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, HeaderComponent],
   templateUrl: './user-management.component.html',
   styleUrl: './user-management.component.scss'
 })
@@ -33,20 +34,7 @@ export class UserManagementComponent {
       }
     });
 
-    console.log(sessionStorage.getItem('userId'), sessionStorage.getItem('roleType'))
-
     this.streamVideo('66394ebeb064d926deea292a');
-  }
-
-  logout() {
-    this.authService.logout().subscribe({
-      next: (data) => {
-        this.router.navigateByUrl('/login');
-        console.log(data);
-      }, error: (err) => {
-        console.log(err);
-      }
-    })
   }
 
   streamVideo(id: string) {

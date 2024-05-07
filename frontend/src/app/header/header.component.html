@@ -1,3 +1,9 @@
 <mat-toolbar class="fixed-header" color="primary">
     <span class="title" (click)="reloadPage()">TeCső</span>
+    <span class="buttons-container">
+        <button mat-raised-button class="loginbutton" *ngIf="!isLoggedIn()" (click)="navigate('/login')">Login</button>
+        <span class="button-space"></span>
+        <button mat-raised-button color="accent" class="signup-button" *ngIf="!isLoggedIn()" (click)="navigate('/signup')">Sign Up</button>
+        <button mat-raised-button class="logout-button" *ngIf="isLoggedIn()" (click)="logout()">Logout</button>
+    </span>
 </mat-toolbar>

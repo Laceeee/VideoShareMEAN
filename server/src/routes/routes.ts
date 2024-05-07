@@ -43,10 +43,14 @@ export const configureRoutes = (passport: PassportStatic, router: Router, gfs: G
             }
             else {
                 if (!user) {
-                    res.status(401).send('Incorrect email or password.')
+                    res.status(401).send('Incorrect email or password.');
                 } else {
                     req.login(user, (err: string | null) => {
-                        res.status(200).send(user);
+                        if (err) {
+                            res.status(500).send('Internal server error.')
+                        } else {
+                            res.status(200).send(user);
+                        }
                     });
                 }
             }
@@ -63,7 +67,7 @@ export const configureRoutes = (passport: PassportStatic, router: Router, gfs: G
                 }
             }) 
         } else {
-            res.status(500).send('User is not logged in.');
+            res.status(403).send('User is not logged in.');
         }
     });
 

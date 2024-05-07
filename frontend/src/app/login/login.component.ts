@@ -6,11 +6,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { HeaderComponent } from '../header/header.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [RouterModule, FormsModule, HeaderComponent, MatFormFieldModule, MatInputModule, MatButtonModule],
+  imports: [RouterModule, FormsModule, HeaderComponent, MatFormFieldModule, MatInputModule, MatButtonModule, CommonModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
@@ -18,7 +19,6 @@ export class LoginComponent {
   email: string = '';
   password: string = '';
   errorMessage: string = '';
-
 
   constructor(private router: Router, private authService: AuthService) { }  
 
@@ -28,12 +28,17 @@ export class LoginComponent {
       this.authService.login(this.email, this.password).subscribe({
         next: (data) => {
           if (data) {
-            sessionStorage.setItem('userId', data.id);
-            sessionStorage.setItem('roleType', data.roleType);
-            this.router.navigateByUrl('/user-management');
+            localStorage.setItem('id', data.id);
+            localStorage.setItem('username', data.username);
+            localStorage.setItem('roleType', data.roleType);
+            this.router.navigateByUrl('/videos');
           }
         }, error: (err) => {
-            console.log(err);
+          if (err.status === 401) {
+            this.errorMessage = 'Incorrect email or password.';
+          } else {
+            this.errorMessage = 'An error occurred. Please try again later.'
+          }
         }
       })
     }

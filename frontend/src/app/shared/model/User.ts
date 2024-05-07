@@ -7,5 +7,6 @@ export interface User {
 
 export interface LoggedInUser {
     id: string;
+    username: string;
     roleType: string;
 }

@@ -135,7 +135,6 @@ export const configureRoutes = (passport: PassportStatic, router: Router, gfs: G
     
                 const video = new Video({
                     user_id,
-                    username,
                     video_id: uploadStream.id,
                     title,
                     description,
@@ -208,48 +207,251 @@ export const configureRoutes = (passport: PassportStatic, router: Router, gfs: G
         }
     });
 
-    router.put('/update-video/:_id', (req: Request, res: Response) => {
+    router.post('/update-video/:video_id/:user_id/:roleType', (req: Request, res: Response) => {
         if (req.isAuthenticated()) {
-            const _id = req.params._id;
+            const video_id = req.params.video_id;
+            const user_id = req.params.user_id;
+            const roleType = req.params.roleType;
             const { title, description } = req.body;
+            const query = Video.findById(video_id);
 
-            if (!title || !description) {
-                return res.status(400).send('Title and description are required.');
-            }
+                
+            query.then(video => {
+            if (!video) {
+                    return res.status(404).send('Video not found.');
+                }
 
-            Video.findOneAndUpdate({ _id: _id }, { title, description }, { new: true })
-                .then(updatedVideo => {
-                    if (!updatedVideo) {
-                        return res.status(404).send('Video not found.');
-                    }
-                    res.status(200).send(updatedVideo);
-                })
-                .catch(error => {
-                    console.error(error);
-                    res.status(500).send('Internal server error.');
-                });
+                if (user_id !== video.user_id || roleType !== 'admin') {
+                    return res.status(403).send('Permission denied');
+                }
+
+                Video.findOneAndUpdate({ _id: video_id }, { title, description }, { new: true })
+                    .then(updatedVideo => {
+                        if (!updatedVideo) {
+                            return res.status(404).send('Video not found.');
+                        }
+                        res.status(200).send(updatedVideo);
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        res.status(500).send('Internal server error.');
+                    });
+            }) 
+            .catch(error => {
+                console.error(error);
+                res.status(500).send('Internal server error.');
+            });
         } else {
             res.status(403).send('User is not logged in.');
         }
     });
     
-    router.delete('/delete-video/:_id', async (req: Request, res: Response) => {
+    router.delete('/delete-video/:video_id/:user_id/:roleType', async (req: Request, res: Response) => {
         if (req.isAuthenticated()) {
             try {
-                const _id = req.params._id;
+                const video_id = req.params.video_id;
+                const user_id = req.params.user_id;
+                const roleType = req.params.roleType;
     
-                const video = await Video.findOne({ _id: _id });
+                const video = await Video.findById(video_id);
                 if (!video) {
                     return res.status(404).send('Video not found.');
+                }
+
+                if (user_id !== video.user_id || roleType !== Roles.admin) {
+                    return res.status(403).send('Permission denied');
                 }
     
                 await gfs.delete(new Types.ObjectId(video.video_id));
     
-                await Video.deleteOne({ _id: _id });
+                await Video.deleteOne({ _id: video_id });
     
                 res.status(200).send('Video deleted successfully.');
             } catch (error) {
                 console.error('Error deleting video:', error);
+                res.status(500).send('Internal server error.');
+            }
+        } else {
+            res.status(403).send('User is not logged in.');
+        }
+    });
+
+    router.post('/comment/:video_id/:user_id', async (req: Request, res: Response) => {
+        if (req.isAuthenticated()) {
+            const video_id = req.params.video_id;
+            const user_id = req.params.user_id;
+            const comment = req.body.comment;
+    
+            try {
+                const video = await Video.findById(video_id);
+                if (!video) {
+                    return res.status(404).send('Video not found.');
+                }
+
+                const user = await User.findById(user_id);
+                if (!user) {
+                    return res.status(404).send('User not found.');
+                }
+    
+                const newComment = {
+                    user_id,
+                    username: user.username,
+                    comment
+                };
+    
+                await Video.findOneAndUpdate(
+                    { _id: video_id },
+                    {
+                        $push: { comments: newComment }
+                    },
+                    { new: true }
+                );
+    
+                const updatedVideo = await Video.findById(video_id);
+                if (!updatedVideo) {
+                    return res.status(404).send('Video not found.');
+                }
+                res.status(200).send(updatedVideo);
+            } catch (error) {
+                console.error(error);
+                res.status(500).send('Internal server error.');
+            }
+        } else {
+            res.status(403).send('User is not logged in.');
+        }
+    });
+
+    router.delete('/delete-comment/:video_id/:user_id/:comment_id', async (req: Request, res: Response) => {
+        if (req.isAuthenticated()) {
+            const video_id = req.params.video_id;
+            const user_id = req.params.user_id;
+            const comment_id = req.params.comment_id;
+    
+            try {
+                const video = await Video.findById(video_id);
+                if (!video) {
+                    return res.status(404).send('Video not found.');
+                }
+
+                const user = await User.findById(user_id);
+                if (!user) {
+                    return res.status(404).send('User not found.');
+                }
+
+                const comment = await Video.findOne({ _id: video_id, 'comments._id': comment_id });
+                if (!comment) {
+                    return res.status(404).send('Comment not found.');
+                }
+
+                if (user_id === comment.user_id || user.roleType === Roles.admin || (user.roleType === Roles.channelowner && video.user_id === user_id)) {
+                    await Video.findOneAndUpdate(
+                        { _id: video_id },
+                        {
+                            $pull: { comments: { _id: comment_id } },
+                        },
+                        { new: true }
+                    );
+                } else {
+                    return res.status(403).send('Permission denied.');
+                }
+    
+                const updatedVideo = await Video.findById(video_id);
+                if (!updatedVideo) {
+                    return res.status(404).send('Video not found.');
+                }
+                res.status(200).send(updatedVideo);
+            } catch (error) {
+                console.error(error);
+                res.status(500).send('Internal server error.');
+            }
+        } else {
+            res.status(403).send('User is not logged in.');
+        }
+    });
+
+    router.get('/like-video/:video_id/:user_id', async (req: Request, res: Response) => {
+        if (req.isAuthenticated()) {
+            const video_id = req.params.video_id;
+            const user_id = req.params.user_id;
+    
+            try {
+                const video = await Video.findOne({ _id: video_id, likedBy: user_id });
+                if (video) {
+                    return res.status(400).send('Video already liked.');
+                }
+    
+                const dislikedVideo = await Video.findOne({ _id: video_id, dislikedBy: user_id });
+                if (dislikedVideo) {
+                    await Video.updateOne(
+                        { _id: video_id },
+                        {
+                            $pull: { dislikedBy: user_id },
+                            $inc: { dislikesCount: -1 }
+                        }
+                    );
+                }
+    
+                await Video.findOneAndUpdate(
+                    { _id: video_id },
+                    {
+                        $push: { likedBy: user_id },
+                        $inc: { likesCount: 1 }
+                    },
+                    { new: true }
+                );
+    
+                const updatedVideo = await Video.findById(video_id);
+                if (!updatedVideo) {
+                    return res.status(404).send('Video not found.');
+                }
+                res.status(200).send(updatedVideo);
+            } catch (error) {
+                console.error(error);
+                res.status(500).send('Internal server error.');
+            }
+        } else {
+            res.status(403).send('User is not logged in.');
+        }
+    });
+
+    router.get('/dislike-video/:video_id/:user_id', async (req: Request, res: Response) => {
+        if (req.isAuthenticated()) {
+            const video_id = req.params.video_id;
+            const user_id = req.params.user_id;
+    
+            try {
+                const video = await Video.findOne({ _id: video_id, dislikedBy: user_id });
+                if (video) {
+                    return res.status(400).send('Video already disliked.');
+                }
+    
+                const likedVideo = await Video.findOne({ _id: video_id, likedBy: user_id });
+                if (likedVideo) {
+                    await Video.updateOne(
+                        { _id: video_id },
+                        {
+                            $pull: { likedBy: user_id },
+                            $inc: { likesCount: -1 }
+                        }
+                    );
+                }
+    
+                await Video.findOneAndUpdate(
+                    { _id: video_id },
+                    {
+                        $push: { dislikedBy: user_id },
+                        $inc: { dislikesCount: 1 }
+                    },
+                    { new: true }
+                );
+    
+                const updatedVideo = await Video.findById(video_id);
+                if (!updatedVideo) {
+                    return res.status(404).send('Video not found.');
+                }
+                res.status(200).send(updatedVideo);
+            } catch (error) {
+                console.error(error);
                 res.status(500).send('Internal server error.');
             }
         } else {

@@ -1,5 +1,5 @@
 <mat-toolbar class="fixed-header" color="primary">
-    <span class="title" (click)="reloadPage()">TeCső</span>
+    <span class="title" (click)="navigate('/videos')">TeCső</span>
     <span class="buttons-container">
         <button mat-raised-button class="loginbutton" *ngIf="!isLoggedIn()" (click)="navigate('/login')">Login</button>
         <span class="button-space"></span>

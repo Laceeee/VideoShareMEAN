@@ -33,17 +33,6 @@ export class UserManagementComponent {
         console.log(err);
       }
     });
-
-    this.streamVideo('66394ebeb064d926deea292a');
   }
 
-  streamVideo(id: string) {
-    this.videoService.streamVideo(id).subscribe({
-      next: (blob) => {
-        this.videoSource = URL.createObjectURL(blob);
-      }, error: (err) => {
-        console.log('Error streaming videos: ', err);
-      }
-    });
-  }
 }

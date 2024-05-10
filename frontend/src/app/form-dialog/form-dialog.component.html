@@ -1,0 +1,13 @@
+<h2 mat-dialog-title>Comment</h2>
+<mat-dialog-content>
+    <form class="form">
+        <mat-form-field appearance="fill">
+            <mat-label>Comment</mat-label>
+            <input matInput [(ngModel)]="comment" name="comment" placeholder="Comment">
+        </mat-form-field>
+    </form>
+</mat-dialog-content>
+<div mat-dialog-actions class="container">
+    <button mat-raised-button color="primary" type="submit" (click)="onSubmit()">Comment</button>
+    <button mat-raised-button color="accent" mat-dialog-close>Cancel</button>
+</div>

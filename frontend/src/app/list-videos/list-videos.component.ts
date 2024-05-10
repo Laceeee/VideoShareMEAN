@@ -3,7 +3,7 @@ import { HeaderComponent } from '../header/header.component';
 import { VideoService } from '../shared/services/video.service';
 import { Video } from '../shared/model/Video';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table' 
-import { MatPaginatorModule, MatPaginator, PageEvent } from '@angular/material/paginator';
+import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 
@@ -16,7 +16,7 @@ import { Router } from '@angular/router';
 })
 export class ListVideosComponent implements AfterViewInit, OnInit {
   videos?: Video[];
-  displayedColumns: string[] = ['title', 'uploader', 'description', 'upload-date', 'views'];
+  displayedColumns: string[] = ['title', 'uploader', 'upload-date', 'views'];
   dataSource = new MatTableDataSource<Video>();
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -38,16 +38,8 @@ export class ListVideosComponent implements AfterViewInit, OnInit {
     this.dataSource.paginator = this.paginator;
   }
 
-  loadVideo(id: string, username: string, title: string) {
-    const sanitizedTitle = title
-      .toLowerCase()
-      .replace(/[á]/g, 'a')
-      .replace(/[é]/g, 'e')
-      .replace(/[í]/g, 'i')
-      .replace(/[óöő]/g, 'o')
-      .replace(/[úüű]/g, 'u')
-      .replace(/[^a-z0-9-]/g, '-');
-    this.router.navigate(['/video', username, sanitizedTitle], { queryParams: { id: id } });
+  loadVideo(id: string) {
+    this.router.navigate(['/video'], { queryParams: { watch: id } });
   }
 
 }

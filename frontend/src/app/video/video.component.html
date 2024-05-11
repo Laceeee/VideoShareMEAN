@@ -10,11 +10,11 @@
             <h1><strong>{{ video?.title }}</strong></h1>
             <div *ngIf="this.user_id === video?.user_id || this.roleType === 'admin'" class="title-row-buttons">
                 <!--<button *ngIf="this.user_id === video?.user_id" (click)="updateVideo()" mat-icon-button>-->
-                <button (click)="updateVideo()" mat-icon-button>
+                <button (click)="updateVideo()" mat-icon-button matTooltip="Edit video">
                     <mat-icon>edit</mat-icon>
                 </button>
                 <span class="button-space"></span>
-                <button (click)="deleteVideo()" mat-icon-button>
+                <button (click)="deleteVideo()" mat-icon-button matTooltip="Delete video">
                     <mat-icon color="warn">delete</mat-icon>
                 </button>
             </div>
@@ -41,19 +41,19 @@
             <table mat-table [dataSource]="dataSource!">
               <ng-container matColumnDef="user">
                 <th mat-header-cell *matHeaderCellDef class="display-cell"> User </th>
-                <td mat-cell *matCellDef="let comment" class="display-cell"> {{comment.username}} </td>
+                <td mat-cell *matCellDef="let comment" class="display-cell">{{comment.username}}</td>
               </ng-container>
           
               <ng-container matColumnDef="comment">
                 <th mat-header-cell *matHeaderCellDef class="display-cell"> Comment </th>
-                <td mat-cell *matCellDef="let comment" class="display-cell"> {{comment.comment}} </td>
+                <td mat-cell *matCellDef="let comment" class="display-cell long-comment">{{comment.comment}}</td>
               </ng-container>
 
               <ng-container matColumnDef="delete">
                 <th mat-header-cell *matHeaderCellDef class="display-cell"> Delete </th>
                 <td mat-cell *matCellDef="let comment" class="display-cell">
-                    <button mat-icon-button (click)="deleteComment(comment._id)">
-                        <mat-icon color="warn" *ngIf="comment.user_id === this.user_id || this.roleType === 'admin' || (this.roleType === 'channelOwner' && this.video?.user_id === this.user_id)">delete</mat-icon>
+                    <button mat-icon-button *ngIf="comment.user_id === this.user_id || this.roleType === 'admin' || (this.roleType === 'channelOwner' && this.video?.user_id === this.user_id)" (click)="deleteComment(comment._id)" matTooltip="Delete comment" matTooltipPosition="right">
+                        <mat-icon color="warn">delete</mat-icon>
                     </button>
                 </td>
               </ng-container>

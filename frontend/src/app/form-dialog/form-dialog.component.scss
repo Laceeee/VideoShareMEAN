@@ -2,3 +2,9 @@
     display: flex;
     justify-content: flex-end;
 }
+
+.video-edit-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}

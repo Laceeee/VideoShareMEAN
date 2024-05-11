@@ -22,11 +22,18 @@ export const configureRoutes = (passport: PassportStatic, router: Router, gfs: G
         const roleType = Roles.viewer;
 
         try {
-            const existingUser = await User.findOne({ email: email });
+            const existingEmail = await User.findOne({ email: email });
 
-            if (existingUser) {
+            if (existingEmail) {
                 return res.status(400).send('Email already exists.');
             }
+
+            const existingUsername = await User.findOne({ username: username });
+
+            if (existingUsername) {
+                return res.status(400).send('Username already exists.');
+            }
+
             const newUser = new User({ email: email, username: username, password: password, roleType: roleType});
             const savedUser = await newUser.save();
 
@@ -221,7 +228,7 @@ export const configureRoutes = (passport: PassportStatic, router: Router, gfs: G
                     return res.status(404).send('Video not found.');
                 }
 
-                if (user_id !== video.user_id || roleType !== 'admin') {
+                if (user_id !== video.user_id && roleType !== Roles.admin) {
                     return res.status(403).send('Permission denied');
                 }
 
@@ -258,7 +265,7 @@ export const configureRoutes = (passport: PassportStatic, router: Router, gfs: G
                     return res.status(404).send('Video not found.');
                 }
 
-                if (user_id !== video.user_id || roleType !== Roles.admin) {
+                if (user_id !== video.user_id && roleType !== Roles.admin) {
                     return res.status(403).send('Permission denied');
                 }
     

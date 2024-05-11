@@ -1,5 +1,5 @@
 class RolesClass {
-    viewer: string = 'vievwer';
+    viewer: string = 'viewer';
     channelowner: string = 'channelowner';
     admin: string = 'admin';
 

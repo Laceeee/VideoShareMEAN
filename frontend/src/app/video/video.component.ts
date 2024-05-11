@@ -13,11 +13,12 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table'
 import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { MatButtonModule } from '@angular/material/button';
 import { FormDialogComponent } from '../form-dialog/form-dialog.component';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-video',
   standalone: true,
-  imports: [HeaderComponent, DatePipe, MatIconModule, MatButtonToggleModule, MatTableModule, MatPaginatorModule, MatButtonModule, CommonModule],
+  imports: [HeaderComponent, DatePipe, MatIconModule, MatButtonToggleModule, MatTableModule, MatPaginatorModule, MatButtonModule, CommonModule, MatTooltipModule],
   templateUrl: './video.component.html',
   styleUrl: './video.component.scss'
 })
@@ -36,7 +37,6 @@ export class VideoComponent implements OnInit{
 
   constructor(private route: ActivatedRoute, 
     private videoService: VideoService, 
-    private router: Router,
     private dialog: MatDialog
   ) {}
 
@@ -72,7 +72,22 @@ export class VideoComponent implements OnInit{
   }
 
   updateVideo() {
-    
+    let dialogRef = this.dialog.open(FormDialogComponent, {
+      data: { title: 'Edit Video', videoTitle: this.video?.title, videoDescription: this.video?.description}
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.videoService.updateVideo(this.id!, this.user_id!, this.roleType!, result.title, result.description).subscribe({
+          next: (updatedVideo) => {
+            this.video = updatedVideo;
+            this.comments = this.video.comments;
+            this.dataSource.data = this.video.comments || [];
+          }, error: (err) => {
+            console.log(err);
+          }
+        });
+      }
+    });
   }
 
   deleteVideo() {
@@ -115,7 +130,7 @@ export class VideoComponent implements OnInit{
 
   commentOnVideo() {
     let dialogRef = this.dialog.open(FormDialogComponent, {
-      data: { videoId: this.id}
+      data: { title: 'Comment'}
     });
     dialogRef.afterClosed().subscribe(result => {0
       if (result) {

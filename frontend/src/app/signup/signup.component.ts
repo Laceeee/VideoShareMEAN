@@ -1,4 +1,4 @@
-import { CommonModule, Location } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { AuthService } from '../shared/services/auth.service';
@@ -20,7 +20,6 @@ export class SignupComponent implements OnInit {
 
   constructor(
     private formBuidler: FormBuilder, 
-    private location: Location, 
     private authService: AuthService,
     private router: Router
   ) { }
@@ -80,7 +79,7 @@ export class SignupComponent implements OnInit {
   }
 
   goBack() {
-    this.location.back();
+    this.router.navigateByUrl('/login');
   }
 
 }

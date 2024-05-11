@@ -2,6 +2,10 @@ table {
     width: 80%; 
 }
 
+.search-row {
+  justify-content: space-between;
+}
+
 .display-videos {
     margin: auto;
     display: flex;

@@ -1,9 +1,30 @@
 <mat-toolbar class="fixed-header" color="primary">
     <span class="title" (click)="navigate('/videos')">TeCső</span>
     <span class="buttons-container">
-        <button mat-raised-button class="loginbutton" *ngIf="!isLoggedIn()" (click)="navigate('/login')">Login</button>
-        <span class="button-space"></span>
-        <button mat-raised-button color="accent" class="signup-button" *ngIf="!isLoggedIn()" (click)="navigate('/signup')">Sign Up</button>
-        <button mat-raised-button class="logout-button" *ngIf="isLoggedIn()" (click)="logout()">Logout</button>
+        <div class="not-logged-in" *ngIf="!isLoggedIn()">
+            <button mat-raised-button class="loginbutton" (click)="navigate('/login')">Login</button>
+            <span class="button-space"></span>
+            <button mat-raised-button color="accent" class="signup-button" (click)="navigate('/signup')">Sign Up</button>
+        </div>
+        <div class="logged-in" *ngIf="isLoggedIn()">
+            <span>{{username}}</span>
+            <button mat-icon-button [matMenuTriggerFor]="menu">
+                <mat-icon>menu</mat-icon>
+            </button>
+        </div>  
+        <mat-menu #menu="matMenu">
+            <button mat-menu-item *ngIf="this.roleType !== 'viewer'">
+              <mat-icon>upload</mat-icon>
+              <span>Upload video</span>
+            </button>
+            <button mat-menu-item *ngIf="this.roleType === 'admin'" (click)="navigate('/user-management')">
+              <mat-icon>manage_accounts</mat-icon>
+              <span>User management</span>
+            </button>
+            <button mat-menu-item (click)="logout()">
+                <mat-icon>logout</mat-icon>
+                <span>Logout</span>
+            </button>
+          </mat-menu>
     </span>
 </mat-toolbar>

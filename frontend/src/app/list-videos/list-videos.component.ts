@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
-import { HeaderComponent } from '../header/header.component';
+import { HeaderComponent } from '../shared/components/header/header.component';
 import { VideoService } from '../shared/services/video.service';
 import { Video } from '../shared/model/Video';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table' 

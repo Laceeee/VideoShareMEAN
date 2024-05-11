@@ -5,7 +5,7 @@ import { AuthService } from '../shared/services/auth.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { HeaderComponent } from '../header/header.component';
+import { HeaderComponent } from '../shared/components/header/header.component';
 import { Router } from '@angular/router';
 
 @Component({
@@ -66,7 +66,6 @@ export class SignupComponent implements OnInit {
         next: (data) => {
           if (data) {
             this.router.navigateByUrl('/login');
-            console.log(data);
           }
         }, error: (err) => {
             console.log(err);

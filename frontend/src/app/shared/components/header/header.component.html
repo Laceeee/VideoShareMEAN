@@ -1,13 +1,13 @@
 <mat-toolbar class="fixed-header" color="primary">
     <span class="title" (click)="navigate('/videos')">TeCső</span>
     <span class="buttons-container">
-        <div class="not-logged-in" *ngIf="!isLoggedIn()">
+        <div *ngIf="!isLoggedIn()">
             <button mat-raised-button class="loginbutton" (click)="navigate('/login')">Login</button>
             <span class="button-space"></span>
             <button mat-raised-button color="accent" class="signup-button" (click)="navigate('/signup')">Sign Up</button>
         </div>
         <div class="logged-in" *ngIf="isLoggedIn()">
-            <span>{{username}}</span>
+            <span class="title">{{username}}</span>
             <button mat-icon-button [matMenuTriggerFor]="menu">
                 <mat-icon>menu</mat-icon>
             </button>

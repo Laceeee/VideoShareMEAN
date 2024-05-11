@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { HeaderComponent } from '../header/header.component';
+import { HeaderComponent } from '../shared/components/header/header.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Video } from '../shared/model/Video';
 import { Comment } from '../shared/model/Comment';
@@ -8,11 +8,11 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonToggleGroup, MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDialog } from '@angular/material/dialog';
-import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
+import { ConfirmationDialogComponent } from '../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table' 
 import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { MatButtonModule } from '@angular/material/button';
-import { FormDialogComponent } from '../form-dialog/form-dialog.component';
+import { FormDialogComponent } from '../shared/components/form-dialog/form-dialog.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({

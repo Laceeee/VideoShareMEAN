@@ -11,8 +11,8 @@ import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { HeaderComponent } from '../header/header.component';
-import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
+import { HeaderComponent } from '../shared/components/header/header.component';
+import { ConfirmationDialogComponent } from '../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 
 
@@ -53,7 +53,15 @@ export class UserManagementComponent implements OnInit, AfterViewInit{
     });
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('segg');
+        const sender_id = localStorage.getItem('id')!; 
+        this.userService.deleteUser(sender_id, id).subscribe({
+          next: (users) => {
+            this.users = users;
+            this.dataSource.data = this.users || [];
+          }, error: (err) => {
+            console.log(err);
+          }
+        });
       }
     });
   }
@@ -64,7 +72,15 @@ export class UserManagementComponent implements OnInit, AfterViewInit{
     });
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('segg');
+        const sender_id = localStorage.getItem('id')!; 
+        this.userService.promoteUser(sender_id, id).subscribe({
+          next: (users) => {
+            this.users = users;
+            this.dataSource.data = this.users || [];
+          }, error: (err) => {
+            console.log(err);
+          }
+        });
       }
     });
   }

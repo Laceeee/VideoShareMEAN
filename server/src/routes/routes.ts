@@ -100,6 +100,103 @@ export const configureRoutes = (passport: PassportStatic, router: Router, gfs: G
         }
     });
 
+    router.delete('/delete-user/:sender_id/:_id', (req: Request, res: Response) => {
+        if (req.isAuthenticated()) {
+            const sender_id = req.params.sender_id;
+            const _id = req.params._id;
+            
+            const query = User.findById(sender_id);
+            query.then(sender => {
+                if (!sender) {
+                    return res.status(404).send('Sender not found.');
+                }
+
+                if (sender.roleType !== Roles.admin) {
+                    return res.status(403).send('Permission denied.');
+                }
+
+                User.deleteOne({ _id: _id })
+                    .then(() => {
+                        User.find({})
+                            .then(users => {
+                                res.status(200).send(users);
+                            })
+                            .catch(error => {
+                                console.log(error);
+                                res.status(500).send('Internal server error.');
+                            });
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        res.status(500).send('Internal server error.');
+                    });
+            })                        
+        } else {
+            res.status(403).send('User is not logged in.');
+        }
+    });
+
+
+    router.get('/promote-user/:sender_id/:_id', (req: Request, res: Response) => {
+        if (req.isAuthenticated()) {
+            const sender_id = req.params.sender_id;
+            const _id = req.params._id;
+
+            const query = User.findById(sender_id);
+            query.then(sender => {
+                if (!sender) {
+                    return res.status(404).send('Sender not found.');
+                }
+
+                if (sender.roleType !== Roles.admin) {
+                    return res.status(403).send('Permission denied.');
+                }
+
+                User.findOneAndUpdate({ _id: _id }, { roleType: Roles.admin }, { new: true })
+                .then(updatedUser => {
+                    User.find({})
+                        .then(users => {
+                            res.status(200).send(users);
+                        })
+                        .catch(error => {
+                            console.log(error);
+                            res.status(500).send('Internal server error.');
+                        });
+                }).catch(error => {
+                    res.status(404).send('User not found.');
+                });
+            })
+        } else {
+            res.status(403).send('User is not logged in.');
+        }
+    });
+
+    router.get('/start-channel/:_id',  (req: Request, res: Response) => {
+        if (req.isAuthenticated()) {
+            const _id = req.params._id;
+            const query = User.findById(_id);
+            query.then(user => {
+                if (!user) {
+                    return res.status(404).send('User not found.');
+                }
+
+                if (user.roleType !== Roles.viewer) {
+                    return res.status(403).send('Permission denied.');
+                }
+
+                User.findOneAndUpdate({ _id: _id }, { roleType: Roles.channelowner }, { new: true })
+                .then(updatedUser => {
+                    res.status(200).send(updatedUser);
+                }).catch(error => {
+                    res.status(404).send('User not found.');
+                });
+            })
+        } else {
+            res.status(403).send('User is not logged in.');
+        }
+    });
+
+
     const upload = multer({ 
         storage: multer.memoryStorage(),
         limits: {

@@ -32,6 +32,8 @@ Run server: npm start (This also build runs npx tsc for typescript)
 
 ### Client side setup
 
+Install angular cli: npm install @angular/cli
+
 Navigate to the frontend folder
 
 Install node packages: npm install

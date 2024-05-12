@@ -26,15 +26,15 @@ mongoose.connect(dbUrl).then(() => {
     return;
 })
 
-// cors
+// cors hat ez nem mukodott
 const whitelist = ['http://localhost:4200']
 const corsOptions = {
     origin: (origin: string | undefined, callback: (error: Error | null, allowed?: boolean) => void) => {
-        if (whitelist.indexOf(origin!) !== -1) {
+        /*if (whitelist.indexOf(origin!) !== -1) {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS.'));
-        }
+        }*/
         callback(null, true);
     },
     credentials: true
@@ -67,5 +67,5 @@ app.use(passport.session());
 configurePassport(passport);
 
 app.listen(port, () => {
-    console.log('Serves in listening on port: ' + port.toString());
+    console.log('Server is listening on port: ' + port.toString());
 });

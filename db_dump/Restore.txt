@@ -1,0 +1,3 @@
+Container indítás után: docker exec -i my-mongo-container /usr/bin/mongorestore --db my_db <path to my_db dump>
+
+Elméletileg ez így jó (kipróbáltam szóval nagyon remélem), így lesznek adatok

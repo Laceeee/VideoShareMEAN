@@ -1,0 +1,6 @@
+test@test.com testpw admin
+channel@test.com testpw channelowner
+viewver@test.com testpw viewer
+wannabeadmin@test.com testpw viewer
+deleteme@test.com testpw viewer
+wantchannel@test.com testpw viewer

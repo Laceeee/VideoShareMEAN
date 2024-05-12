@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
-import { MatButton } from '@angular/material/button';
+import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-form-dialog',
   standalone: true,
-  imports: [MatButton, MatDialogModule, MatFormFieldModule, FormsModule, MatInputModule, CommonModule],
+  imports: [MatButtonModule, MatDialogModule, MatFormFieldModule, FormsModule, MatInputModule, CommonModule],
   templateUrl: './form-dialog.component.html',
   styleUrl: './form-dialog.component.scss'
 })

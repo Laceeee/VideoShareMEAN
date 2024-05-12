@@ -9,8 +9,7 @@
         <div class="title-row">
             <h1><strong>{{ video?.title }}</strong></h1>
             <div *ngIf="this.user_id === video?.user_id || this.role === 'admin'" class="title-row-buttons">
-                <button *ngIf="this.user_id === video?.user_id" (click)="updateVideo()" mat-icon-button matTooltip="Edit video">
-                <!--<button (click)="updateVideo()" mat-icon-button matTooltip="Edit video">-->
+                <button (click)="updateVideo()" mat-icon-button matTooltip="Edit video">
                     <mat-icon>edit</mat-icon>
                 </button>
                 <span class="button-space"></span>

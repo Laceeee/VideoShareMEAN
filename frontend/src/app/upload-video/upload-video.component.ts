@@ -8,6 +8,8 @@ import { CommonModule } from '@angular/common';
 import { VideoService } from '../shared/services/video.service';
 import { Router } from '@angular/router';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { InfoDialogComponent } from '../shared/components/info-dialog/info-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-upload-video',
@@ -28,7 +30,7 @@ export class UploadVideoComponent implements OnInit{
   user_id: string = '';
   username: string = '';
 
-  constructor(private videoService: VideoService, private router: Router) { }
+  constructor(private videoService: VideoService, private router: Router, private infoDialog: MatDialog) { }
 
   ngOnInit() {
     this.user_id = localStorage.getItem('id')!;
@@ -63,16 +65,22 @@ export class UploadVideoComponent implements OnInit{
         this.videoService.uploadVideo(this.user_id, this.username, this.title, this.description, this.video).subscribe({
           next: (video) => {
             this.isLoading = false;
+            this.openDialog('Success', 'Video uploaded successfully.');
             this.router.navigate(['/video'], { queryParams: { watch: video._id } });
           }, error: (err) => {
             this.isLoading = false;
             this.errorMessage = 'An error occurred. Please try again later.'
+            this.openDialog('Error', err.error);
          }
         });
     }
     else {
       this.errorMessage = 'Form is empty.';
     }
+  }
+
+  openDialog(title: string, message: string) {
+    this.infoDialog.open(InfoDialogComponent,  { data: { title: title, message: message }});
   }
 
 }

@@ -11,6 +11,10 @@
     width: 100%;
 }
 
+video {
+    max-height: 720px;
+}
+
 .video-details {
     align-items: flex-start;
     margin-left: 5px;

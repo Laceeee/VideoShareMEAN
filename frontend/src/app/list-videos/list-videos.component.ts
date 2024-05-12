@@ -12,6 +12,8 @@ import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog } from '@angular/material/dialog';
+import { InfoDialogComponent } from '../shared/components/info-dialog/info-dialog.component';
 
 @Component({
   selector: 'app-list-videos',
@@ -28,15 +30,16 @@ export class ListVideosComponent implements AfterViewInit, OnInit {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  constructor(private videoService: VideoService, private router: Router) {}
+  constructor(private videoService: VideoService, private router: Router, private infoDialog: MatDialog ) {}
   
   ngOnInit(): void {
     this.videoService.listVideos().subscribe({
       next: (data) => {
         this.videos = data;
-        this.dataSource.data = this.videos || [];
+        const reversedVideos = [...data].reverse();
+        this.dataSource.data = reversedVideos;
       }, error: (err) => {
-        console.log(err);
+        this.openDialog('Error', err.error);
       }
     });
   }
@@ -56,6 +59,10 @@ export class ListVideosComponent implements AfterViewInit, OnInit {
 
   loadVideo(id: string) {
     this.router.navigate(['/video'], { queryParams: { watch: id } });
+  }
+
+  openDialog(title: string, message: string) {
+    this.infoDialog.open(InfoDialogComponent,  { data: { title: title, message: message }});
   }
 
 }

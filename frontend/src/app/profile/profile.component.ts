@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { ConfirmationDialogComponent } from '../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { InfoDialogComponent } from '../shared/components/info-dialog/info-dialog.component';
 
 @Component({
   selector: 'app-profile',
@@ -19,7 +20,11 @@ export class ProfileComponent implements OnInit{
   user?: User;
   user_id: string = '';
 
-  constructor(private userService: UserService, private actRoute: ActivatedRoute, private dialog: MatDialog) { }
+  constructor(private userService: UserService, 
+    private actRoute: ActivatedRoute, 
+    private dialog: MatDialog,
+    private infoDialog: MatDialog
+  ) { }
 
   ngOnInit(): void {
     this.actRoute.params.subscribe(params => {
@@ -28,7 +33,7 @@ export class ProfileComponent implements OnInit{
           this.user = data;
           this.user_id = localStorage.getItem('id')!;
         }, error: (err) => {
-          console.log(err);
+          this.openDialog('Error', err.error);
         }
       });
     });
@@ -42,13 +47,18 @@ export class ProfileComponent implements OnInit{
       if (result) {
         this.userService.createChannel(this.user!._id).subscribe({
           next: (user) => {
+            this.openDialog('Success', 'Channel created successfully!');
             this.user = user;
             localStorage.setItem('role', this.user.role);
           }, error: (err) => {
-            console.log(err);
+            this.openDialog('Error', err.error);
           }
         });
       }
     });
+  }
+
+  openDialog(title: string, message: string) {
+    this.infoDialog.open(InfoDialogComponent,  { data: { title: title, message: message }});
   }
 }

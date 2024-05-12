@@ -7,6 +7,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { HeaderComponent } from '../shared/components/header/header.component';
 import { Router } from '@angular/router';
+import { InfoDialogComponent } from '../shared/components/info-dialog/info-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-signup',
@@ -22,7 +24,8 @@ export class SignupComponent implements OnInit {
   constructor(
     private formBuidler: FormBuilder, 
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private infoDialog: MatDialog
   ) { }
 
   ngOnInit() {
@@ -66,6 +69,7 @@ export class SignupComponent implements OnInit {
       this.authService.register(this.signupForm.value).subscribe({
         next: (data) => {
           if (data) {
+            this.openDialog('Success', 'Account created successfully. Please login.');
             this.router.navigateByUrl('/login');
           }
         }, error: (err) => {
@@ -74,8 +78,12 @@ export class SignupComponent implements OnInit {
       })
     }
     else {
-      console.log('Form is not valid!');
+      this.errorMessage ='Form is not valid!';
     }
+  }
+
+  openDialog(title: string, message: string) {
+    this.infoDialog.open(InfoDialogComponent,  { data: { title: title, message: message }});
   }
 
   goBack() {

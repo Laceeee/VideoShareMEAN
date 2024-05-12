@@ -14,6 +14,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { HeaderComponent } from '../shared/components/header/header.component';
 import { ConfirmationDialogComponent } from '../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { InfoDialogComponent } from '../shared/components/info-dialog/info-dialog.component';
 
 
 @Component({
@@ -32,7 +33,8 @@ export class UserManagementComponent implements OnInit, AfterViewInit{
 
   constructor(
     private userService: UserService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private infoDialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -42,7 +44,7 @@ export class UserManagementComponent implements OnInit, AfterViewInit{
         this.dataSource.data = this.users || [];
         this.role = localStorage.getItem('role')!;
       }, error: (err) => {
-        console.log(err);
+        this.openDialog('Error', err.error);
       }
     });
   }
@@ -56,10 +58,11 @@ export class UserManagementComponent implements OnInit, AfterViewInit{
         const sender_id = localStorage.getItem('id')!; 
         this.userService.deleteUser(sender_id, id).subscribe({
           next: (users) => {
+            this.openDialog('Success', `${username} has been deleted.`);
             this.users = users;
             this.dataSource.data = this.users || [];
           }, error: (err) => {
-            console.log(err);
+            this.openDialog('Error', err.error);
           }
         });
       }
@@ -75,14 +78,19 @@ export class UserManagementComponent implements OnInit, AfterViewInit{
         const sender_id = localStorage.getItem('id')!; 
         this.userService.promoteUser(sender_id, id).subscribe({
           next: (users) => {
+            this.openDialog('Success', `${username} has been promoted to admin.`);
             this.users = users;
             this.dataSource.data = this.users || [];
           }, error: (err) => {
-            console.log(err);
+            this.openDialog('Error', err.error);
           }
         });
       }
     });
+  }
+
+  openDialog(title: string, message: string) {
+    this.infoDialog.open(InfoDialogComponent,  { data: { title: title, message: message }});
   }
 
   ngAfterViewInit() {

@@ -6,6 +6,8 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDialog } from '@angular/material/dialog';
+import { InfoDialogComponent } from '../info-dialog/info-dialog.component';
 
 @Component({
   selector: 'app-header',
@@ -18,7 +20,7 @@ export class HeaderComponent {
   username: string = '';
   role: string = '';
   
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(private router: Router, private authService: AuthService, private infoDialog: MatDialog) {}
 
   isLoggedIn(): boolean {    
     if (localStorage.getItem('id') !== null) {
@@ -33,10 +35,11 @@ export class HeaderComponent {
     localStorage.clear();
     this.authService.logout().subscribe({
       next: (data) => {
+        this.openDialog('Success', 'Logged out successfully!');
         this.router.navigateByUrl('/login');
         console.log(data);
       }, error: (err) => {
-        console.log(err);
+        this.openDialog('Error', err.error);
       }
     })
   }
@@ -51,6 +54,10 @@ export class HeaderComponent {
 
   reloadPage() {
     location.reload();
+  }
+
+  openDialog(title: string, message: string) {
+    this.infoDialog.open(InfoDialogComponent,  { data: { title: title, message: message }});
   }
 
 }

@@ -14,6 +14,7 @@ import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { MatButtonModule } from '@angular/material/button';
 import { FormDialogComponent } from '../shared/components/form-dialog/form-dialog.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { InfoDialogComponent } from '../shared/components/info-dialog/info-dialog.component';
 
 @Component({
   selector: 'app-video',
@@ -38,7 +39,8 @@ export class VideoComponent implements OnInit{
   constructor(private route: ActivatedRoute, 
     private videoService: VideoService,
     private router: Router, 
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private infoDialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -52,7 +54,8 @@ export class VideoComponent implements OnInit{
       next: (video) => {
         this.video = video;
         this.comments = this.video.comments;
-        this.dataSource.data = this.video.comments || [];
+        const reversedComments = [...this.comments].reverse();
+        this.dataSource.data = reversedComments;
         if (this.video.likedBy?.includes(this.user_id!)) {
           this.group.value = 'like';
         }
@@ -63,11 +66,11 @@ export class VideoComponent implements OnInit{
           next: (blob) => {
             this.videoSource = URL.createObjectURL(blob);
           }, error: (err) => {
-            console.log('Error streaming videos: ', err);
+            this.openDialog('Error', 'Error streaming video:' + err.error);
           }
         })
       }, error: (err) => {
-        console.log(err);
+        this.openDialog('Error', err.error);
       }
     })
   }
@@ -80,11 +83,13 @@ export class VideoComponent implements OnInit{
       if (result) {
         this.videoService.updateVideo(this.id!, this.user_id!, this.role!, result.title, result.description).subscribe({
           next: (updatedVideo) => {
+            this.openDialog('Success', 'Video updated successfully.');
             this.video = updatedVideo;
             this.comments = this.video.comments;
-            this.dataSource.data = this.video.comments || [];
+            const reversedComments = [...this.comments].reverse();
+            this.dataSource.data = reversedComments;
           }, error: (err) => {
-            console.log(err);
+            this.openDialog('Error', err.error);
           }
         });
       }
@@ -99,9 +104,10 @@ export class VideoComponent implements OnInit{
       if (result) {
         this.videoService.deleteVideo(this.id!, this.user_id!, this.role!).subscribe({
           next: (success) => {
+            this.openDialog('Success', 'Video deleted successfully.');
             this.router.navigateByUrl('/videos');
           }, error: (err) => {
-            console.log(err);
+            this.openDialog('Error', err.error);
           }
         });
       }
@@ -116,11 +122,13 @@ export class VideoComponent implements OnInit{
       if (result) {
         this.videoService.deleteComment(this.id!, this.user_id!, comment_id).subscribe({
           next: (updatedVideo) => {
+            this.openDialog('Success', 'Comment deleted successfully.');
             this.video = updatedVideo;
             this.comments = this.video.comments;
-            this.dataSource.data = this.video.comments || [];
+            const reversedComments = [...this.comments].reverse();
+            this.dataSource.data = reversedComments;
           }, error: (err) => {
-            console.log(err);
+            this.openDialog('Error', err.error);
           }
         });
       }
@@ -137,9 +145,10 @@ export class VideoComponent implements OnInit{
           next: (updatedVideo) => {
             this.video = updatedVideo;
             this.comments = this.video.comments;
-            this.dataSource.data = this.video.comments || [];
+            const reversedComments = [...this.comments].reverse();
+            this.dataSource.data = reversedComments;
           }, error: (err) => {
-            console.log(err);
+            this.openDialog('Error', err.error);
           }
         });
       }
@@ -153,7 +162,7 @@ export class VideoComponent implements OnInit{
           next: (updatedVideo) => {
             this.video = updatedVideo;
           }, error: (err) => {
-            console.log(err);
+            this.openDialog('Error', err.error);
           }
         })
       }
@@ -164,11 +173,15 @@ export class VideoComponent implements OnInit{
           next: (updatedVideo) => {
             this.video = updatedVideo;
           }, error: (err) => {
-            console.log(err);
+            this.openDialog('Error', err.error);
           }
         })
       }
     }
+  }
+
+  openDialog(title: string, message: string) {
+    this.infoDialog.open(InfoDialogComponent,  { data: { title: title, message: message }});
   }
 
   ngAfterViewInit() {

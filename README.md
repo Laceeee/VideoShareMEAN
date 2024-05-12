@@ -40,4 +40,4 @@ Run frontend: ng serve
 
 ## Result
 
-If everything went according to plan you can now vew the site at localhost:4200
+If everything went according to plan you can now view the site at localhost:4200

@@ -2,11 +2,11 @@ export interface User {
     email: string;
     username: string;
     password: string;
-    roleType: string;
+    role: string;
 }
 
 export interface LoggedInUser {
     id: string;
     username: string;
-    roleType: string;
+    role: string;
 }

@@ -25,7 +25,7 @@ import { MatDialog } from '@angular/material/dialog';
 })
 export class UserManagementComponent implements OnInit, AfterViewInit{
   users?: User[];
-  roleType?: string;
+  role?: string;
   displayedColumns: string[] = ['username', 'role', 'actions'];
   dataSource = new MatTableDataSource<User>();
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -40,7 +40,7 @@ export class UserManagementComponent implements OnInit, AfterViewInit{
       next: (data) => {
         this.users = data;
         this.dataSource.data = this.users || [];
-        this.roleType = localStorage.getItem('roleType')!;
+        this.role = localStorage.getItem('role')!;
       }, error: (err) => {
         console.log(err);
       }

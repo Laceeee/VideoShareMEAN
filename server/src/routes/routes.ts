@@ -19,7 +19,7 @@ export const configureRoutes = (passport: PassportStatic, router: Router, gfs: G
         const email = req.body.email;
         const username = req.body.username;
         const password = req.body.password;
-        const roleType = Roles.viewer;
+        const role = Roles.viewer;
 
         try {
             const existingEmail = await User.findOne({ email: email });
@@ -34,7 +34,7 @@ export const configureRoutes = (passport: PassportStatic, router: Router, gfs: G
                 return res.status(400).send('Username already exists.');
             }
 
-            const newUser = new User({ email: email, username: username, password: password, roleType: roleType});
+            const newUser = new User({ email: email, username: username, password: password, role: role});
             const savedUser = await newUser.save();
 
             res.status(200).send(savedUser);
@@ -100,6 +100,21 @@ export const configureRoutes = (passport: PassportStatic, router: Router, gfs: G
         }
     });
 
+    router.get('/get-user/:username', (req: Request, res: Response) => {
+        if (req.isAuthenticated()) {
+            const username = req.params.username;
+            const query = User.findOne({ username: username });
+            query.then(data => {
+                res.status(200).send(data);
+            }).catch(error => {
+                console.log(error);
+                res.status(404).send('User not found.');
+            })
+        } else {
+            res.status(403).send('User is not logged in.');
+        }
+    });
+
     router.delete('/delete-user/:sender_id/:_id', (req: Request, res: Response) => {
         if (req.isAuthenticated()) {
             const sender_id = req.params.sender_id;
@@ -111,7 +126,7 @@ export const configureRoutes = (passport: PassportStatic, router: Router, gfs: G
                     return res.status(404).send('Sender not found.');
                 }
 
-                if (sender.roleType !== Roles.admin) {
+                if (sender.role !== Roles.admin) {
                     return res.status(403).send('Permission denied.');
                 }
 
@@ -148,11 +163,11 @@ export const configureRoutes = (passport: PassportStatic, router: Router, gfs: G
                     return res.status(404).send('Sender not found.');
                 }
 
-                if (sender.roleType !== Roles.admin) {
+                if (sender.role !== Roles.admin) {
                     return res.status(403).send('Permission denied.');
                 }
 
-                User.findOneAndUpdate({ _id: _id }, { roleType: Roles.admin }, { new: true })
+                User.findOneAndUpdate({ _id: _id }, { role: Roles.admin }, { new: true })
                 .then(updatedUser => {
                     User.find({})
                         .then(users => {
@@ -171,7 +186,7 @@ export const configureRoutes = (passport: PassportStatic, router: Router, gfs: G
         }
     });
 
-    router.get('/start-channel/:_id',  (req: Request, res: Response) => {
+    router.get('/create-channel/:_id',  (req: Request, res: Response) => {
         if (req.isAuthenticated()) {
             const _id = req.params._id;
             const query = User.findById(_id);
@@ -180,11 +195,11 @@ export const configureRoutes = (passport: PassportStatic, router: Router, gfs: G
                     return res.status(404).send('User not found.');
                 }
 
-                if (user.roleType !== Roles.viewer) {
+                if (user.role !== Roles.viewer) {
                     return res.status(403).send('Permission denied.');
                 }
 
-                User.findOneAndUpdate({ _id: _id }, { roleType: Roles.channelowner }, { new: true })
+                User.findOneAndUpdate({ _id: _id }, { role: Roles.channelowner }, { new: true })
                 .then(updatedUser => {
                     res.status(200).send(updatedUser);
                 }).catch(error => {
@@ -311,11 +326,11 @@ export const configureRoutes = (passport: PassportStatic, router: Router, gfs: G
         }
     });
 
-    router.post('/update-video/:video_id/:user_id/:roleType', (req: Request, res: Response) => {
+    router.post('/update-video/:video_id/:user_id/:role', (req: Request, res: Response) => {
         if (req.isAuthenticated()) {
             const video_id = req.params.video_id;
             const user_id = req.params.user_id;
-            const roleType = req.params.roleType;
+            const role = req.params.role;
             const { title, description } = req.body;
             const query = Video.findById(video_id);
 
@@ -325,7 +340,7 @@ export const configureRoutes = (passport: PassportStatic, router: Router, gfs: G
                     return res.status(404).send('Video not found.');
                 }
 
-                if (user_id !== video.user_id && roleType !== Roles.admin) {
+                if (user_id !== video.user_id && role !== Roles.admin) {
                     return res.status(403).send('Permission denied');
                 }
 
@@ -350,19 +365,19 @@ export const configureRoutes = (passport: PassportStatic, router: Router, gfs: G
         }
     });
     
-    router.delete('/delete-video/:video_id/:user_id/:roleType', async (req: Request, res: Response) => {
+    router.delete('/delete-video/:video_id/:user_id/:role', async (req: Request, res: Response) => {
         if (req.isAuthenticated()) {
             try {
                 const video_id = req.params.video_id;
                 const user_id = req.params.user_id;
-                const roleType = req.params.roleType;
+                const role = req.params.role;
     
                 const video = await Video.findById(video_id);
                 if (!video) {
                     return res.status(404).send('Video not found.');
                 }
 
-                if (user_id !== video.user_id && roleType !== Roles.admin) {
+                if (user_id !== video.user_id && role !== Roles.admin) {
                     return res.status(403).send('Permission denied');
                 }
     
@@ -447,7 +462,7 @@ export const configureRoutes = (passport: PassportStatic, router: Router, gfs: G
                     return res.status(404).send('Comment not found.');
                 }
 
-                if (user_id === comment.user_id || user.roleType === Roles.admin || (user.roleType === Roles.channelowner && video.user_id === user_id)) {
+                if (user_id === comment.user_id || user.role === Roles.admin || (user.role === Roles.channelowner && video.user_id === user_id)) {
                     await Video.findOneAndUpdate(
                         { _id: video_id },
                         {

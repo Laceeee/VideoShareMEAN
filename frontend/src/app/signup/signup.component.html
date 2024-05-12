@@ -22,6 +22,9 @@
           Passwords do not match!
         </mat-error>
       </mat-form-field>
+      <mat-error *ngIf="errorMessage">
+        {{ errorMessage }}
+      </mat-error>
       <div class="buttons">
         <button mat-raised-button color="primary" type="submit">Sign Up</button>
       </div>

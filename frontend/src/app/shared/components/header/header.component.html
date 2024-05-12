@@ -7,17 +7,17 @@
             <button mat-raised-button color="accent" class="signup-button" (click)="navigate('/signup')">Sign Up</button>
         </div>
         <div class="logged-in" *ngIf="isLoggedIn()">
-            <span class="title">{{username}}</span>
+            <span class="title" (click)="navigateToProfile()">{{username}}</span>
             <button mat-icon-button [matMenuTriggerFor]="menu">
                 <mat-icon>menu</mat-icon>
             </button>
         </div>  
         <mat-menu #menu="matMenu">
-            <button mat-menu-item *ngIf="this.roleType !== 'viewer'">
+            <button mat-menu-item *ngIf="this.role !== 'viewer'">
               <mat-icon>upload</mat-icon>
               <span>Upload video</span>
             </button>
-            <button mat-menu-item *ngIf="this.roleType === 'admin'" (click)="navigate('/user-management')">
+            <button mat-menu-item *ngIf="this.role === 'admin'" (click)="navigate('/user-management')">
               <mat-icon>manage_accounts</mat-icon>
               <span>User management</span>
             </button>

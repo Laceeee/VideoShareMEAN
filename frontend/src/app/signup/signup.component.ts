@@ -17,6 +17,7 @@ import { Router } from '@angular/router';
 })
 export class SignupComponent implements OnInit {
   signupForm!: FormGroup;
+  errorMessage: string = '';
 
   constructor(
     private formBuidler: FormBuilder, 
@@ -68,7 +69,7 @@ export class SignupComponent implements OnInit {
             this.router.navigateByUrl('/login');
           }
         }, error: (err) => {
-            console.log(err);
+          this.errorMessage = err.error;
         }
       })
     }

@@ -7,7 +7,7 @@ interface IUser extends Document {
     email: string;
     username?: string;
     password: string;
-    roleType?: string;
+    role?: string;
     comparePassword: (candidatePassword: string, callback: (error: Error | null, isMatch: boolean) => void) => void;
 }
 
@@ -15,7 +15,7 @@ const UserSchema: Schema<IUser> = new mongoose.Schema({
     email: {type: String, required: true},
     username: {type: String},
     password: {type: String, required: true},
-    roleType: {type: String}
+    role: {type: String}
 });
 
 UserSchema.pre<IUser>('save', function(next) {

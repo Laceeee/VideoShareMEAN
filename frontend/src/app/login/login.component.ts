@@ -30,7 +30,7 @@ export class LoginComponent {
           if (data) {
             localStorage.setItem('id', data.id);
             localStorage.setItem('username', data.username);
-            localStorage.setItem('roleType', data.roleType);
+            localStorage.setItem('role', data.role);
             this.router.navigateByUrl('/videos');
           }
         }, error: (err) => {

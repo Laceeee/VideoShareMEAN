@@ -21,16 +21,16 @@ export class VideoService {
     return this.http.get<Video>('http://localhost:5000/get-video/' + id, {withCredentials: true});
   }
 
-  updateVideo(video_id: string, user_id: string, roleType: string, title: string, description: string) {
+  updateVideo(video_id: string, user_id: string, role: string, title: string, description: string) {
     const body = new URLSearchParams();
     body.set('title', title);
     body.set('description', description);
 
-    return this.http.post<Video>('http://localhost:5000/update-video/' + video_id + '/' + user_id + '/' + roleType, body, {headers: this.headers, withCredentials: true});
+    return this.http.post<Video>('http://localhost:5000/update-video/' + video_id + '/' + user_id + '/' + role, body, {headers: this.headers, withCredentials: true});
   }
 
-  deleteVideo(video_id: string, user_id: string, roleType: string) {
-    return this.http.delete('http://localhost:5000/delete-video/' + video_id + '/' + user_id + '/' + roleType, {withCredentials: true});
+  deleteVideo(video_id: string, user_id: string, role: string) {
+    return this.http.delete('http://localhost:5000/delete-video/' + video_id + '/' + user_id + '/' + role, {withCredentials: true});
   }
 
   listVideos() {

@@ -28,7 +28,7 @@ export class VideoComponent implements OnInit{
   comments?: Comment[];
   videoSource?: string;
   user_id?: string;
-  roleType?: string;
+  role?: string;
   displayedColumns: string[] = ['user', 'comment', 'delete'];
   dataSource = new MatTableDataSource<Comment>();
 
@@ -42,7 +42,7 @@ export class VideoComponent implements OnInit{
 
   ngOnInit(): void {
     this.user_id = localStorage.getItem('id')!;
-    this.roleType = localStorage.getItem('roleType')!;
+    this.role = localStorage.getItem('role')!;
     this.route.queryParams.subscribe(params => {
       this.id = params['watch'];
     });
@@ -77,7 +77,7 @@ export class VideoComponent implements OnInit{
     });
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.videoService.updateVideo(this.id!, this.user_id!, this.roleType!, result.title, result.description).subscribe({
+        this.videoService.updateVideo(this.id!, this.user_id!, this.role!, result.title, result.description).subscribe({
           next: (updatedVideo) => {
             this.video = updatedVideo;
             this.comments = this.video.comments;
@@ -97,7 +97,7 @@ export class VideoComponent implements OnInit{
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         console.log(result);
-        /*this.videoService.deleteVideo(this.video!.video_id, this.user_id!, this.roleType!).subscribe({
+        /*this.videoService.deleteVideo(this.video!.video_id, this.user_id!, this.role!).subscribe({
           next: (success) => {
             this.router.navigateByUrl('/videos');
             console.log(success);

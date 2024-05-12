@@ -16,14 +16,14 @@ import { MatIconModule } from '@angular/material/icon';
 })
 export class HeaderComponent {
   username: string = '';
-  roleType: string = '';
+  role: string = '';
   
   constructor(private router: Router, private authService: AuthService) {}
 
   isLoggedIn(): boolean {    
     if (localStorage.getItem('id') !== null) {
       this.username = localStorage.getItem('username')!;
-      this.roleType = localStorage.getItem('roleType')!;
+      this.role = localStorage.getItem('role')!;
       return true;
     }
     return false;
@@ -43,6 +43,10 @@ export class HeaderComponent {
 
   navigate(url: string) {
     this.router.navigate([url]);
+  }
+  
+  navigateToProfile() {
+    this.router.navigate(['/profile', this.username]);
   }
 
   reloadPage() {

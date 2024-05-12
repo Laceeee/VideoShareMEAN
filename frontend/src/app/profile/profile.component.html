@@ -1,1 +1,10 @@
-<p>profile works!</p>
+<app-header></app-header>
+<div *ngIf="user" class="user-container">
+  <div>
+    <h2>User Details</h2>
+    <p><strong>Email:</strong> {{ user.email }}<p>
+    <p><strong>Username:</strong> {{ user.username }}<p>
+    <p><strong>Role:</strong> {{ user.role }}</p>
+  </div>
+  <button *ngIf="user.role === 'viewer' && user.username === check_username" mat-raised-button color="primary" (click)="createChannel()">Create channel</button>
+</div>

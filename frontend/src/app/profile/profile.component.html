@@ -6,5 +6,5 @@
     <p><strong>Username:</strong> {{ user.username }}<p>
     <p><strong>Role:</strong> {{ user.role }}</p>
   </div>
-  <button *ngIf="user.role === 'viewer' && user.username === check_username" mat-raised-button color="primary" (click)="createChannel()">Create channel</button>
+  <button *ngIf="user.role === 'viewer' && user_id === this.user._id" mat-raised-button color="primary" (click)="createChannel()">Create channel</button>
 </div>

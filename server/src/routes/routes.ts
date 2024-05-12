@@ -254,14 +254,25 @@ export const configureRoutes = (passport: PassportStatic, router: Router, gfs: G
     
                 const video = new Video({
                     user_id,
+                    username,
                     video_id: uploadStream.id,
                     title,
                     description,
                     upload_date: new Date(),
                 });
-                await video.save();
-    
-                res.status(200).send(video);
+                
+
+                uploadStream.on('finish', async () => {
+                    await video.save().then(() => {
+                        res.status(200).send(video);
+                    }).catch(error => {
+                        console.error(error);
+                        res.status(500).send('Internal server error.');
+                    });
+                });
+                uploadStream.on('error', (error) => {
+                    res.status(500).send('Internal server error.');
+                });
             } catch (error) {
                 res.status(500).send('Internal server error.');
             }
@@ -365,14 +376,13 @@ export const configureRoutes = (passport: PassportStatic, router: Router, gfs: G
         }
     });
     
-    router.delete('/delete-video/:video_id/:user_id/:role', async (req: Request, res: Response) => {
+    router.delete('/delete-video/:video_id/:user_id/:role', (req: Request, res: Response) => {
         if (req.isAuthenticated()) {
-            try {
-                const video_id = req.params.video_id;
-                const user_id = req.params.user_id;
-                const role = req.params.role;
-    
-                const video = await Video.findById(video_id);
+            const video_id = req.params.video_id;
+            const user_id = req.params.user_id;
+            const role = req.params.role;
+            const query = Video.findById(video_id);
+            query.then(async video => {
                 if (!video) {
                     return res.status(404).send('Video not found.');
                 }
@@ -380,16 +390,20 @@ export const configureRoutes = (passport: PassportStatic, router: Router, gfs: G
                 if (user_id !== video.user_id && role !== Roles.admin) {
                     return res.status(403).send('Permission denied');
                 }
-    
+
                 await gfs.delete(new Types.ObjectId(video.video_id));
-    
-                await Video.deleteOne({ _id: video_id });
-    
-                res.status(200).send('Video deleted successfully.');
-            } catch (error) {
+
+                Video.deleteOne({ _id: video_id }).then(() => {
+                    res.status(200).json({message: 'Video deleted successfully.'});
+                }).catch(error => {
+                    console.error(error);
+                    res.status(500).send('Internal server error.');
+                });
+            }).catch(error => {
                 console.error('Error deleting video:', error);
                 res.status(500).send('Internal server error.');
-            }
+            });
+            
         } else {
             res.status(403).send('User is not logged in.');
         }

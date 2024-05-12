@@ -1,6 +1,7 @@
 import { Comment } from "./Comment";
 
 export interface Video {
+    _id: string,
     user_id: string,
     username: string,
     video_id: string,

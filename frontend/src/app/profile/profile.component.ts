@@ -5,20 +5,21 @@ import { User } from '../shared/model/User';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
+import { ConfirmationDialogComponent } from '../shared/components/confirmation-dialog/confirmation-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [HeaderComponent, CommonModule, MatButtonModule],
+  imports: [HeaderComponent, CommonModule, MatButtonModule, ConfirmationDialogComponent],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss'
 })
 export class ProfileComponent implements OnInit{
   user?: User;
   user_id: string = '';
-  check_username: string = '';
 
-  constructor(private userService: UserService, private actRoute: ActivatedRoute) { }
+  constructor(private userService: UserService, private actRoute: ActivatedRoute, private dialog: MatDialog) { }
 
   ngOnInit(): void {
     this.actRoute.params.subscribe(params => {
@@ -26,7 +27,6 @@ export class ProfileComponent implements OnInit{
         next: (data) => {
           this.user = data;
           this.user_id = localStorage.getItem('id')!;
-          this.check_username = localStorage.getItem('username')!;
         }, error: (err) => {
           console.log(err);
         }
@@ -35,12 +35,19 @@ export class ProfileComponent implements OnInit{
   }
 
   createChannel() {
-    this.userService.createChannel(this.user_id).subscribe({
-      next: (user) => {
-        this.user = user;
-        localStorage.setItem('role', this.user.role);
-      }, error: (err) => {
-        console.log(err);
+    let dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      data: { title: 'Create channel', message: 'Do you want to create a channel?', buttonText: 'Create', color: 'primary'}
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.userService.createChannel(this.user!._id).subscribe({
+          next: (user) => {
+            this.user = user;
+            localStorage.setItem('role', this.user.role);
+          }, error: (err) => {
+            console.log(err);
+          }
+        });
       }
     });
   }

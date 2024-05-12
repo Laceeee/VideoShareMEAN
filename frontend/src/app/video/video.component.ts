@@ -36,7 +36,8 @@ export class VideoComponent implements OnInit{
   @ViewChild('group') group!: MatButtonToggleGroup;
 
   constructor(private route: ActivatedRoute, 
-    private videoService: VideoService, 
+    private videoService: VideoService,
+    private router: Router, 
     private dialog: MatDialog
   ) {}
 
@@ -96,15 +97,13 @@ export class VideoComponent implements OnInit{
     });
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log(result);
-        /*this.videoService.deleteVideo(this.video!.video_id, this.user_id!, this.role!).subscribe({
+        this.videoService.deleteVideo(this.id!, this.user_id!, this.role!).subscribe({
           next: (success) => {
             this.router.navigateByUrl('/videos');
-            console.log(success);
           }, error: (err) => {
             console.log(err);
           }
-        });*/
+        });
       }
     });
   }

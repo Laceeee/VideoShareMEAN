@@ -1,0 +1,26 @@
+<app-header></app-header>
+<div class="upload-container">
+  <form class="upload-form">
+    <mat-form-field appearance="fill">
+      <mat-label>Title</mat-label>
+      <input matInput [(ngModel)]="title" name="title" placeholder="Title" required [disabled]="isLoading">
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Description</mat-label>
+      <input matInput [(ngModel)]="description" name="description" placeholder="Description" required [disabled]="isLoading">
+    </mat-form-field>
+    <div>
+      <button type="button" mat-raised-button (click)="fileInput.click()" [disabled]="isLoading">Choose File</button>
+      <span *ngIf="selectedFileName"> {{ selectedFileName }}</span>
+      <span *ngIf="!selectedFileName"> No file selected.</span>
+      <input hidden (change)="onFileSelected($event)" #fileInput type="file" accept=".mp4,.mkv,.avi">
+    </div>
+    <mat-error *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </mat-error>
+    <div class="buttons">
+      <button mat-raised-button color="primary" type="submit" (click)="uploadVideo()" [disabled]="isLoading">Upload video</button>
+    </div>
+    <mat-spinner *ngIf="isLoading" diameter="50"></mat-spinner>
+  </form>
+</div>

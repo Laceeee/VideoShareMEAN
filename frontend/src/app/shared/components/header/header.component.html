@@ -13,7 +13,7 @@
             </button>
         </div>  
         <mat-menu #menu="matMenu">
-            <button mat-menu-item *ngIf="this.role !== 'viewer'">
+            <button mat-menu-item *ngIf="this.role !== 'viewer'" (click)="navigate('/upload-video')">
               <mat-icon>upload</mat-icon>
               <span>Upload video</span>
             </button>

@@ -8,6 +8,7 @@ export const routes: Routes = [
     { path: 'videos', loadComponent: () => import('./list-videos/list-videos.component').then((c) => c.ListVideosComponent), canActivate: [authGuard]},
     { path: 'video', loadComponent: () => import('./video/video.component').then((c) => c.VideoComponent), canActivate: [authGuard]},
     { path: 'profile/:username', loadComponent: () => import('./profile/profile.component').then((c) => c.ProfileComponent), canActivate: [authGuard]},
+    { path: 'upload-video', loadComponent: () => import('./upload-video/upload-video.component').then((c) => c.UploadVideoComponent), canActivate: [authGuard]},
     { path: 'user-management', loadComponent: () => import('./user-management/user-management.component').then((c) => c.UserManagementComponent), canActivate: [authGuard]},
     { path: '**', redirectTo: 'videos'}
 ];

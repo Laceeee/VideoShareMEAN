@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express from 'express';
 import { configureRoutes } from './routes/routes';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
@@ -43,10 +43,11 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // bodyParser
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+app.use(bodyParser.json({ limit: '50mb' }));
 
 // express.json
-app.use(express.json());
+app.use(express.json({limit: '50mb'}));
 
 // cookieParser
 app.use(cookieParser());

@@ -7,6 +7,7 @@ export const authGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   return inject(AuthService).checkAuth().pipe(map(isAuthenticated => {
     if(!isAuthenticated) {
+      localStorage.clear();
       router.navigateByUrl('/login');
       return false;
     }
@@ -14,6 +15,7 @@ export const authGuard: CanActivateFn = (route, state) => {
       return true;
     }
   }), catchError(error => {
+    localStorage.clear();
     console.log(error);
     router.navigateByUrl('/login');
     return of(false);

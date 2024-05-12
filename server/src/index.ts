@@ -30,11 +30,11 @@ mongoose.connect(dbUrl).then(() => {
 const whitelist = ['http://localhost:4200']
 const corsOptions = {
     origin: (origin: string | undefined, callback: (error: Error | null, allowed?: boolean) => void) => {
-        /*if (whitelist.indexOf(origin!) !== -1) {
+        if (whitelist.indexOf(origin!) !== -1) {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS.'));
-        }*/
+        }
         callback(null, true);
     },
     credentials: true

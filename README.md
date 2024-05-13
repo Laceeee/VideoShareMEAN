@@ -1,6 +1,6 @@
 # VideoShareMEAN
 
-This is a video sharing platform project written in MEAN stack created for the Program System Development course.
+This is a video sharing platform project written in the MEAN stack created for the Program System Development course.
 
 ## Requirements
 
@@ -32,7 +32,7 @@ Run server: npm start (This also build runs npx tsc for typescript)
 
 ### Client side setup
 
-Install angular cli: npm install @angular/cli
+Install angular cli: npm install -g @angular/cli
 
 Navigate to the frontend folder
 

@@ -15,6 +15,7 @@ import { HeaderComponent } from '../shared/components/header/header.component';
 import { ConfirmationDialogComponent } from '../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { InfoDialogComponent } from '../shared/components/info-dialog/info-dialog.component';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -34,19 +35,25 @@ export class UserManagementComponent implements OnInit, AfterViewInit{
   constructor(
     private userService: UserService,
     private dialog: MatDialog,
-    private infoDialog: MatDialog
+    private infoDialog: MatDialog,
+    private router: Router
   ) {}
 
   ngOnInit() {
-    this.userService.getAll().subscribe({
-      next: (data) => {
-        this.users = data;
-        this.dataSource.data = this.users || [];
-        this.role = localStorage.getItem('role')!;
-      }, error: (err) => {
-        this.openDialog('Error', err.error);
-      }
-    });
+    if (localStorage.getItem('role') === 'admin') {
+      this.userService.getAll().subscribe({
+        next: (data) => {
+          this.users = data;
+          this.dataSource.data = this.users || [];
+          this.role = localStorage.getItem('role')!;
+        }, error: (err) => {
+          this.openDialog('Error', err.error);
+        }
+      });
+    }
+    else {
+      this.router.navigateByUrl('/videos');
+    }
   }
 
   deleteUser(id: string, username: string) {

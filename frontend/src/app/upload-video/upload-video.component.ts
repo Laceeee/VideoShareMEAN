@@ -33,8 +33,12 @@ export class UploadVideoComponent implements OnInit{
   constructor(private videoService: VideoService, private router: Router, private infoDialog: MatDialog) { }
 
   ngOnInit() {
-    this.user_id = localStorage.getItem('id')!;
-    this.username = localStorage.getItem('username')!;
+    if (localStorage.getItem('role') === 'viewer') {
+      this.router.navigateByUrl('/videos');
+    } else {
+      this.user_id = localStorage.getItem('id')!;
+      this.username = localStorage.getItem('username')!;
+    }
   }
 
   onFileSelected(event: Event) {

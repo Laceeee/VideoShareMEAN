@@ -27,7 +27,7 @@ mongoose.connect(dbUrl).then(() => {
 })
 
 // cors hat ez nem mukodott
-const whitelist = ['http://localhost:4200']
+const whitelist = ['http://localhost:4200', 'http://localhost:4201']
 const corsOptions = {
     origin: (origin: string | undefined, callback: (error: Error | null, allowed?: boolean) => void) => {
         /*if (whitelist.indexOf(origin!) !== -1) {

@@ -11,6 +11,8 @@ USER root
 RUN curl -L -O https://fastdl.mongodb.org/tools/db/mongodb-database-tools-debian12-x86_64-100.10.0.deb
 RUN dpkg -i mongodb-database-tools-debian12-x86_64-100.10.0.deb
 
+RUN npm install -g @angular/cli@17.3.6
+
 # Configure SSH
 RUN mkdir /var/run/sshd
 RUN echo 'root:dockerpassword' | chpasswd
@@ -37,8 +39,7 @@ RUN mkdir -p /home/deploy/.ssh && \
 # Create app directory
 WORKDIR /app
 
-# Expose port for the application and SSH
-EXPOSE 4200 22
+EXPOSE 22 4201 5000
 
 # Start SSH service and the application
 CMD ["/bin/bash", "-c", "/usr/sbin/sshd && /bin/bash"]

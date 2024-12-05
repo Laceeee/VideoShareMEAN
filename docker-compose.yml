@@ -30,8 +30,9 @@ services:
       dockerfile: Dockerfile_deploy-env
     container_name: node20-deploy-container
     ports:
-      - "4200:4200"
+      - "4201:4201"
       - "2222:22"
+      - "5000:5000"
     networks:
       deploy-network:
         ipv4_address: 172.32.0.3  # Assign a static IP to deploy container

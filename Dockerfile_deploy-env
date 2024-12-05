@@ -6,6 +6,11 @@ RUN apt-get update && apt-get install -y openssh-server && apt-get clean
 
 RUN npm install -g pm2
 
+USER root
+
+RUN curl -L -O https://fastdl.mongodb.org/tools/db/mongodb-database-tools-debian12-x86_64-100.10.0.deb
+RUN dpkg -i mongodb-database-tools-debian12-x86_64-100.10.0.deb
+
 # Configure SSH
 RUN mkdir /var/run/sshd
 RUN echo 'root:dockerpassword' | chpasswd

@@ -19,7 +19,7 @@ services:
       dockerfile: Dockerfile_mongo
     container_name: mongo
     ports:
-      - "6000:27017"
+      - "27017:27017"
     networks:
       deploy-network:
         ipv4_address: 172.32.0.4  # Assign a static IP to Mongo

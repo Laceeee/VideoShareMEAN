@@ -1,0 +1,5 @@
+FROM jenkins/jenkins:lts
+
+USER root
+RUN curl -L -O https://fastdl.mongodb.org/tools/db/mongodb-database-tools-debian12-x86_64-100.10.0.deb
+RUN dpkg -i mongodb-database-tools-debian12-x86_64-100.10.0.deb

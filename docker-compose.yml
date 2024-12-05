@@ -1,6 +1,8 @@
 services:
   jenkins:
-    image: jenkins/jenkins:lts
+    build:
+      context: .
+      dockerfile: Dockerfile_jenkins
     container_name: jenkins
     ports:
       - "8080:8080"
@@ -10,6 +12,17 @@ services:
     networks:
       deploy-network:
         ipv4_address: 172.32.0.2  # Assign a static IP to Jenkins
+
+  mongo:
+    build:
+      context: .
+      dockerfile: Dockerfile_mongo
+    container_name: mongo
+    ports:
+      - "6000:27017"
+    networks:
+      deploy-network:
+        ipv4_address: 172.32.0.4  # Assign a static IP to Mongo
 
   deploy-container:
     build:

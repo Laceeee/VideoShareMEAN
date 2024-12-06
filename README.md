@@ -2,6 +2,10 @@
 
 This is a video sharing platform project written in the MEAN stack created for the Program System Development course.
 
+### Cloud and Devops Basics
+
+For this course the source code can be found on feature/devops_terraform branch.
+
 ## Requirements
 
 Node.js 20^.12.2

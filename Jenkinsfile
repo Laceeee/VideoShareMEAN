@@ -2,12 +2,12 @@ pipeline {
     agent any
 
     tools {
-        nodejs 'NodeJS 20'  // Feltételezve, hogy van egy "NodeJS 20" nevű NodeJS telepítés konfigurálva Jenkinsben
+        nodejs 'NodeJS 20'
     }
 
     environment {
-        GITHUB_REPO = 'https://github.com/jankiz/nodejs-sample-app-for-devops.git'
-        BRANCH = 'feature/http-server'
+        GITHUB_REPO = 'https://github.com/Laceeee/VideoShareMEAN.git'
+        BRANCH = 'feature/devops_jenkins_deploy'
         DEPLOY_CONTAINER = 'node20-deploy-container'
     }
 
@@ -20,59 +20,57 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'npm ci'  // Használjuk az 'npm ci'-t az 'npm install' helyett a konzisztens telepítés érdekében
-            }
-        }
-
-        stage('Lint') {
-            steps {
-                sh 'npm run lint'
-            }
-        }
-
-        stage('Test Source') {
-            steps {
-                sh 'npm run test:src'
+                dir ('server') {
+                    sh 'npm ci'
+                }
             }
         }
 
         stage('Build') {
             steps {
-                sh 'npm run build'
+                dir ('server') {
+                    sh 'npm run build'
+                }
             }
         }
 
-        stage('Test Distribution') {
+        stage('Test Build') {
             steps {
-                sh 'npm run test:dist'
+                dir ('server') {
+                    sh 'npm run test'
+                }
             }
         }
 
         stage('Archive Artifacts') {
             steps {
-                archiveArtifacts artifacts: 'dist/**/*', fingerprint: true
-            }
-        }
-
-        stage('Deploy') {
-            when {
-                anyOf {
-                    branch env.BRANCH
+                dir ('server') {
+                    archiveArtifacts artifacts: 'build/**/*', fingerprint: true
                 }
             }
+        }
+        
+        stage('Deploy') {
             steps {
                 echo 'Deploying the application...'
-                sshagent(credentials: ['jenkins-deploy-key']) { // sshagent plugin szükséges
+                sshagent(credentials: ['jenkins-deploy-key']) {
                     sh """
                         ssh -o StrictHostKeyChecking=no deploy@${env.DEPLOY_CONTAINER} -p 22 '
                             cd /app
                             rm -rf *
-                            git clone https://github.com/jankiz/nodejs-sample-app-for-devops.git
-                            cd /app/nodejs-sample-app-for-devops
-                            git checkout origin/feature/http-server
+                            git clone https://github.com/Laceeee/VideoShareMEAN.git
+                            cd /app/VideoShareMEAN
+                            git checkout feature/devops_jenkins_deploy
+                            mongorestore --db my_db mongodb://172.32.0.4:27017 /app/VideoShareMEAN/db_dump/my_db
+                            cd /app/VideoShareMEAN/server
                             npm ci
                             npm run build
-                            pm2 start dist/index.js --name "calculator-app"
+                            pm2 delete "server" || true
+                            pm2 start build/index.js --name "server"
+                            cd /app/VideoShareMEAN/frontend
+                            npm ci
+                            pm2 delete "video-app" || true
+                            pm2 start "ng serve --port 4200 --host 0.0.0.0" --name "video-app"
                         '
                     """
                 }
@@ -81,7 +79,6 @@ pipeline {
 
         stage('Cleanup') {
             steps {
-                // Munkaterület tisztítása
                 deleteDir()
             }
         }
@@ -89,11 +86,10 @@ pipeline {
 
     post {
         success {
-            echo 'Pipeline sikeresen lefutott!'
+            echo 'Pipeline ran successfully!'
         }
         failure {
-            echo 'A pipeline végrehajtása sikertelen volt.'
-            // Itt értesítést küldhetnénk, például e-mailt vagy Slack üzenetet
+            echo 'The pipeline execution failed!'
         }
     }
 }

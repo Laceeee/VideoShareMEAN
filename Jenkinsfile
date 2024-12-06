@@ -60,7 +60,7 @@ pipeline {
                             rm -rf *
                             git clone https://github.com/Laceeee/VideoShareMEAN.git
                             cd /app/VideoShareMEAN
-                            git checkout feature/devops_jenkins_deploy
+                            git checkout feature/devops_terraform
                             mongorestore --db my_db mongodb://172.32.0.4:27017 /app/VideoShareMEAN/db_dump/my_db
                             cd /app/VideoShareMEAN/server
                             npm ci

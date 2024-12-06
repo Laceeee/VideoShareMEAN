@@ -3,20 +3,29 @@ const express = require('express');
 const { configureRoutes } = require('../build/routes/routes');
 const passport = require('passport');
 const mongoose = require('mongoose');
-const mongodb_1 = require('mongodb');
-const mongoose_2 = require('mongoose');
-
-const { User } = require('../build/model/User');
 const { configurePassport } = require('../build/passport/passport');
+const { GridFSBucket } = require('mongodb');
+const User = require('../build/model/User').User;
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 beforeAll(async () => {
-    await mongoose.connect('mongodb://localhost:27017/my_db', { useNewUrlParser: true, useUnifiedTopology: true });
-    const bucket = new mongodb_1.GridFSBucket(mongoose_2.connection.db, { bucketName: 'videos' });
-    configureRoutes(passport, app, bucket);
+    mongoose.connect = jest.fn().mockResolvedValue({});
+    mongoose.disconnect = jest.fn().mockResolvedValue({});
+    mongoose.connection.db = {
+        collection: jest.fn().mockReturnValue({
+            find: jest.fn(),
+            findOne: jest.fn(),
+            insertOne: jest.fn(),
+            updateOne: jest.fn(),
+            deleteOne: jest.fn(),
+        }),
+    };
+
+    const bucket = new GridFSBucket(mongoose.connection.db, { bucketName: 'videos' });
+    app.use('/', configureRoutes(passport, express.Router(), bucket));
 
     app.use(passport.initialize());
     app.use(passport.session());
@@ -26,6 +35,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
     await mongoose.disconnect();
+    jest.clearAllMocks();
 });
 
 describe('API Endpoints Tests', () => {

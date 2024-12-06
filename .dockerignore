@@ -1,0 +1,5 @@
+.terraform/
+db_dump/
+frontend/
+server/
+terraform_modules/

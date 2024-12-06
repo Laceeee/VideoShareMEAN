@@ -7,8 +7,8 @@ pipeline {
 
     environment {
         GITHUB_REPO = 'https://github.com/Laceeee/VideoShareMEAN.git'
-        BRANCH = 'feature/devops_jenkins_deploy'
-        DEPLOY_CONTAINER = 'node20-deploy-container'
+        BRANCH = 'feature/devops_terraform'
+        DEPLOY_CONTAINER = 'prf-project-deploy-env'
     }
 
     stages {

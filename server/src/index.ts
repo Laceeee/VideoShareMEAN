@@ -11,7 +11,7 @@ import { GridFSBucket } from 'mongodb';
 
 const app = express();
 const port = 5000;
-const dbUrl = 'mongodb://localhost:6000/my_db';
+const dbUrl = 'mongodb://172.32.0.4:27017/my_db';
 
 // mongoose connection
 mongoose.connect(dbUrl).then(() => {

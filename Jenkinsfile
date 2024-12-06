@@ -67,6 +67,9 @@ pipeline {
                         ssh -o StrictHostKeyChecking=no deploy@${env.DEPLOY_CONTAINER} -p 22 '
                             git config --global http.postBuffer 1073741824
                             git config --global http.maxRequestBuffer 1073741824
+                            git config --global core.compression 9
+                            git config --global http.lowSpeedLimit 0
+                            git config --global http.lowSpeedTime 9999
                             cd /app
                             rm -rf *
                             git clone https://github.com/Laceeee/VideoShareMEAN.git

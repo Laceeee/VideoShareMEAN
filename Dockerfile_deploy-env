@@ -36,10 +36,22 @@ RUN mkdir -p /home/deploy/.ssh && \
     chmod 600 /home/deploy/.ssh/authorized_keys && \
     rm /tmp/jenkins_deploy_key.pub
 
+# Install Zabbix Agent
+RUN apt-get update && apt-get install -y zabbix-agent
+# Configure Zabbix Agent
+COPY zabbix_agent2.conf /etc/zabbix/zabbix_agent2.conf
+
+# Install rsyslog
+RUN apt-get update && apt-get install -y rsyslog
+# Create rsyslog config
+COPY rsyslog.conf /etc/rsyslog.conf
+
+ENV PM2_SYSLOG=true
+
 # Create app directory
 WORKDIR /app
 
-EXPOSE 22 4200 5000
+EXPOSE 22 4200 5000 10050
 
 # Start SSH service and the application
 CMD ["/usr/sbin/sshd", "-D"]

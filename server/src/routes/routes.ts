@@ -8,11 +8,91 @@ import { Readable } from 'stream';
 import { Types } from 'mongoose';
 import multer from 'multer';
 import mongoose from 'mongoose';
+import http from 'http';
+import { URL } from 'url';
+import promClient from 'prom-client';
+
+// Create a Registry to store metrics
+const register = new promClient.Registry();
+
+// Add default metrics (CPU, memory, etc.)
+promClient.collectDefaultMetrics({
+  register,
+  prefix: 'server_'
+});
+
+// Create custom metrics
+const httpRequestDuration = new promClient.Histogram({
+  name: 'http_request_duration_seconds',
+  help: 'Duration of HTTP requests in seconds',
+  labelNames: ['method', 'path', 'status_code'],
+  buckets: [0.01, 0.05, 0.1, 0.5, 1]
+});
+
+const httpRequestTotal = new promClient.Counter({
+  name: 'http_requests_total',
+  help: 'Total number of HTTP requests',
+  labelNames: ['method', 'path', 'status_code']
+});
+
+const calculationErrors = new promClient.Counter({
+  name: 'calculation_errors_total',
+  help: 'Total number of calculation errors',
+  labelNames: ['error_type']
+});
+
+const calculationTotal = new promClient.Counter({
+  name: 'calculations_total',
+  help: 'Total number of calculations performed',
+});
+
+// Register custom metrics
+register.registerMetric(httpRequestDuration);
+register.registerMetric(httpRequestTotal);
+register.registerMetric(calculationErrors);
+register.registerMetric(calculationTotal);
 
 export const configureRoutes = (passport: PassportStatic, router: Router, gfs: GridFSBucket): Router => {
 
+    const trackRequestMetrics = (req: Request, res: Response, next: NextFunction) => {
+        const startTime = process.hrtime();
+
+        const endTimer = (statusCode: number) => {
+            const [seconds, nanoseconds] = process.hrtime(startTime);
+            const duration = seconds + nanoseconds / 1e9;
+            const path = new URL(req.url, `http://${req.headers.host}`).pathname;
+            
+            httpRequestDuration
+                .labels(req.method, path || '', statusCode.toString())
+                .observe(duration);
+            
+            httpRequestTotal
+                .labels(req.method, path || '', statusCode.toString())
+                .inc();
+        };
+
+        res.on('finish', () => {
+            endTimer(res.statusCode);
+        });
+
+        next();
+    };
+
+    router.use(trackRequestMetrics);
+
     router.get('/', (req: Request, res: Response) => {
         res.status(200).send('Hello World!');
+    });
+
+    router.get('/metrics', async (req: Request, res: Response) => {
+        res.setHeader('Content-Type', register.contentType);
+        try {
+            const metrics = await register.metrics();
+            res.status(200).send(metrics);
+        } catch (error) {
+            res.status(500).send('Error collecting metrics');
+            console.error('Error occurred while collecting metrics');
+        }
     });
 
     router.post('/register', async (req: Request, res: Response) => {

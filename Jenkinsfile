@@ -12,6 +12,15 @@ pipeline {
     }
 
     stages {
+        stage('Setup Git Config') {
+            steps {
+                sh '''
+                    git config --global http.postBuffer 1073741824
+                    git config --global http.maxRequestBuffer 1073741824
+                '''
+            }
+        }
+
         stage('Checkout') {
             steps {
                 git branch: env.BRANCH, url: env.GITHUB_REPO
@@ -56,6 +65,8 @@ pipeline {
                 sshagent(credentials: ['jenkins-deploy-key']) {
                     sh """
                         ssh -o StrictHostKeyChecking=no deploy@${env.DEPLOY_CONTAINER} -p 22 '
+                            git config --global http.postBuffer 1073741824
+                            git config --global http.maxRequestBuffer 1073741824
                             cd /app
                             rm -rf *
                             git clone https://github.com/Laceeee/VideoShareMEAN.git

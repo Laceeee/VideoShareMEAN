@@ -35,6 +35,39 @@ module "mongo" {
   container_name = "${var.project_name}-mongodb"
 }
 
+# Prometheus modul
+module "prometheus" {
+  source = "./terraform_modules/prometheus"
+  
+  network = docker_network.app_network.id
+}
+
+# Grafana modul
+module "grafana" {
+  source = "./terraform_modules/grafana"
+  
+  network = docker_network.app_network.id
+  prometheus_url = "http://prometheus:9090"
+}
+
+# Zabbix modul
+module "zabbix" {
+  source = "./terraform_modules/zabbix"
+  
+  network = docker_network.app_network.id
+  mysql_root_password = var.mysql_root_password
+  zabbix_mysql_password = var.zabbix_mysql_password
+}
+
+# Graylog modul
+module "graylog" {
+  source = "./terraform_modules/graylog"
+  
+  network                    = docker_network.app_network.id
+  graylog_password_secret    = var.graylog_password_secret
+  graylog_root_password_sha2 = var.graylog_root_password_sha2
+}
+
 output "network_info" {
   value = {
     network_id   = docker_network.app_network.id

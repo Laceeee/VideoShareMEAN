@@ -29,6 +29,12 @@ variable "server_port" {
   default     = 5000
 }
 
+variable "pm2_port" {
+  description = "pm2 port"
+  type        = number
+  default     = 10050
+}
+
 variable "image_tag" {
   description = "Docker image tag"
   type        = string

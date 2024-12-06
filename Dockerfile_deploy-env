@@ -37,9 +37,12 @@ RUN mkdir -p /home/deploy/.ssh && \
     rm /tmp/jenkins_deploy_key.pub
 
 # Install Zabbix Agent
-RUN apt-get update && apt-get install -y zabbix-agent
+RUN apt-get update && apt-get install -y zabbix-agent2
 # Configure Zabbix Agent
 COPY zabbix_agent2.conf /etc/zabbix/zabbix_agent2.conf
+
+COPY start.sh /usr/local/bin/start.sh
+RUN chmod +x /usr/local/bin/start.sh
 
 # Install rsyslog
 RUN apt-get update && apt-get install -y rsyslog
@@ -54,4 +57,4 @@ WORKDIR /app
 EXPOSE 22 4200 5000 10050
 
 # Start SSH service and the application
-CMD ["/usr/sbin/sshd", "-D"]
+CMD ["/usr/local/bin/start.sh"]

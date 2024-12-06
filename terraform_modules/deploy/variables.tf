@@ -29,7 +29,7 @@ variable "server_port" {
   default     = 5000
 }
 
-variable "pm2_port" {
+variable "zabbix_port" {
   description = "pm2 port"
   type        = number
   default     = 10050

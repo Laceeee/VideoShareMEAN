@@ -38,6 +38,11 @@ resource "docker_container" "deploy-env" {
     internal = var.server_port
     external = var.server_port
   }
+
+  ports {
+    internal = var.zabbix_port
+    external = var.zabbix_port
+  }
   
   # Hálózat csatlakozás
   networks_advanced {

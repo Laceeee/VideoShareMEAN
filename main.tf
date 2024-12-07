@@ -59,15 +59,6 @@ module "zabbix" {
   zabbix_mysql_password = var.zabbix_mysql_password
 }
 
-# Graylog modul
-module "graylog" {
-  source = "./terraform_modules/graylog"
-  
-  network                    = docker_network.app_network.id
-  graylog_password_secret    = var.graylog_password_secret
-  graylog_root_password_sha2 = var.graylog_root_password_sha2
-}
-
 output "network_info" {
   value = {
     network_id   = docker_network.app_network.id

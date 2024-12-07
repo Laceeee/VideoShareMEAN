@@ -7,11 +7,11 @@ Used tools: Terraform, Jenkins, Prometheus, Grafana, Zabbix
 
 Docker
 
-## Setup on Windows
+## Setup
 
 After cloning the project and switching to the feature/devops_terraform branch
 
-### Create path variable for terraform
+### Create path variable for terraform (For Windows)
 
 Create a terraform.bat file somewhere on your computer.\
 Copy this code in there:\
